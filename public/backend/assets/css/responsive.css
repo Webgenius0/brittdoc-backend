@@ -1,0 +1,284 @@
+/* responsive starts */
+@media screen and (max-width: 1300px) {
+    .phone {
+      max-width: 300px;
+    }
+  }
+  
+  @media screen and (max-width: 1150px) {
+    .phone {
+      max-width: 250px;
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .logo {
+      max-width: 100px;
+      height: auto;
+    }
+  
+    nav a:nth-child(1) {
+      margin-right: 30px;
+    }
+  
+    .cta-button {
+      font-size: 14px;
+      padding: 16px 20px;
+    }
+  
+    .hero h1 {
+      font-size: 36px; /* Reduced font size */
+      margin-bottom: 32px;
+    }
+  
+    .stats {
+      padding-top: 150px;
+      flex-direction: column;
+      align-items: center;
+      background-size: contain;
+    }
+  
+    .stat-item {
+      padding: 8px 24px;
+      margin-bottom: 20px;
+    }
+  
+    .stat-item:nth-child(2) {
+      border: none;
+    }
+  
+    .value-proposition {
+      padding: 80px 0px;
+    }
+  
+    .cards {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+  
+    .card {
+      padding: 24px;
+    }
+  
+    .card h3 {
+      font-size: 20px; /* Reduced font size */
+    }
+  
+    .card p {
+      font-size: 14px; /* Reduced font size */
+    }
+  
+    .industries {
+      padding: 80px 0;
+    }
+  
+    .industries-cards-container {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+  
+    .industries-card h3 {
+      font-size: 20px; /* Reduced font size */
+    }
+  
+    .industries-card p {
+      font-size: 14px; /* Reduced font size */
+    }
+  }
+  
+  /* Further adjustments for screens below 768px */
+  @media (max-width: 768px) {
+    .phone {
+      position: static;
+    }
+  
+    .phone-mockups {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+    }
+  
+    .logo {
+      max-width: 80px;
+      height: auto;
+    }
+  
+    .header-container {
+      gap: 10px;
+    }
+  
+    nav a:nth-child(1) {
+      margin-right: 16px;
+    }
+  
+    .cta-button {
+      font-size: 14px;
+      padding: 14px 16px;
+    }
+  
+    .hero h1 {
+      font-size: 28px; /* Reduced font size */
+      margin-bottom: 24px;
+    }
+  
+    .stats {
+      padding-top: 120px;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .stat-item {
+      padding: 8px 20px;
+      margin-bottom: 20px;
+    }
+  
+    .stat-item h2 {
+      font-size: 36px; /* Reduced font size */
+    }
+  
+    .stat-item p {
+      font-size: 14px; /* Reduced to 14px */
+    }
+  
+    .value-proposition {
+      padding: 60px 0px;
+    }
+  
+    .cards {
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 40px;
+    }
+  
+    .card {
+      padding: 20px;
+    }
+  
+    .card h3 {
+      font-size: 18px; /* Reduced font size */
+    }
+  
+    .card p {
+      font-size: 14px; /* Reduced font size */
+    }
+  
+    .industries {
+      padding: 60px 0;
+    }
+  
+    .industries-cards-container {
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 40px;
+    }
+  
+    .industries-card-icon svg {
+      width: 60px;
+      height: 60px;
+    }
+  
+    .industries-card h3 {
+      font-size: 20px;
+    }
+  
+    .industries-card p {
+      font-size: 18px;
+    }
+  }
+  
+  /* Final adjustments for screens below 480px */
+  @media (max-width: 480px) {
+    .header-container {
+      padding: 15px;
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    nav a {
+      display: none;
+    }
+  
+    nav .cta-button {
+      display: none;
+    }
+  
+    .hero {
+      padding-top: 35px;
+    }
+  
+    .hero h1 {
+      font-size: 28px;
+      margin: 0 16px 40px;
+      line-height: 35px;
+    }
+  
+    .stats {
+      padding-top: 80px;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .stat-item {
+      padding: 8px 16px;
+      margin-bottom: 12px;
+    }
+  
+    .stat-item h2 {
+      font-size: 30px;
+    }
+  
+    .stat-item p {
+      font-size: 14px;
+    }
+  
+    .rating {
+      flex-direction: column;
+    }
+  
+    .value-proposition {
+      padding: 40px 0px;
+    }
+  
+    .cards {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 30px;
+    }
+  
+    .card {
+      padding: 16px;
+    }
+  
+    .card h3 {
+      font-size: 16px; /* Reduced font size */
+    }
+  
+    .card p {
+      font-size: 14px; /* Reduced font size */
+    }
+  
+    .industries {
+      padding: 40px 0;
+    }
+  
+    .industries-cards-container {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 30px;
+    }
+  
+    .industries-card-icon svg {
+      width: 48px;
+      height: 48px;
+    }
+  
+    .industries-card h3 {
+      font-size: 20px; /* Reduced font size */
+    }
+  
+    .industries-card p {
+      font-size: 18px; /* Reduced font size */
+    }
+  }
+  /* responsive ends */

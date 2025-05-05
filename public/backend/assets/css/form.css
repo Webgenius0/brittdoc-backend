@@ -1,0 +1,298 @@
+/* dashboard review */
+.tm-reviews-section{
+    display: grid;
+    grid-template-columns: repeat(1,fr);
+    gap: 50px;
+}
+.tm-reviews-card-wrapper{
+    display: flex;
+    gap: 22px;
+}
+.tm-review-img-area{
+    width: 277px;
+    height: 242px; 
+    border-radius: 10px;
+    overflow: hidden;
+}
+.tm-review-img-area img{
+    width: 100%;
+    height: 100%; 
+    object-fit: cover;
+}
+.tm-review-main-content{
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    width: 100%;
+}
+.tm-review-main-content-header{
+    display: flex;
+    gap: 21px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.tm-review-main-content-header h2{
+    color: #222E48;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 42.24px;
+    letter-spacing: -0.64px;
+}
+.tm-review-star-text,
+.tm-review-star-wrapper{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.tm-review-star-text span{
+color:  #404A60;
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: 21px;
+}
+.tm-review-main-content-lower{
+    color: #404A60;
+font-size: 20px;
+font-style: normal;
+font-weight: 400;
+line-height: 32.8px;
+max-width: 945px;
+}
+
+
+/* settings.html start */
+.tm-form{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    height: auto;
+    margin: auto 0;
+  }
+  .form-field-wrapper{
+    display: flex;
+    gap: 20px;
+  }
+  .tm-form .form-group{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  .tm-form .form-group label{
+    color:  #252C32;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 21.12px;
+    letter-spacing: -0.32px;
+  }
+  .tm-form .form-group input,
+  .tm-form .input-group input{
+    padding: 17.134px 28.557px 18.276px 28.557px;
+    border-radius: 4px;
+  border: 1px solid  #D5D8E2;
+  background: #FFF;
+  outline: none !important;
+  box-shadow: none !important;
+  }
+  .tm-form .input-group{
+    width: fit-content;
+  }
+  .tm-form .form-group .tm-dropdown{
+    border-radius: 4px;
+  border: 1px solid  #D5D8E2;
+  background: #FFF;
+  color:  #6B7280;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  outline: none !important;
+  box-shadow: none !important;
+  }
+  .tm-form .nice-select{
+    height: 60px;
+    display: flex;
+    align-items: center;
+  }
+  .tm-form .nice-select::after{
+   width: 8px;
+   height: 8px;
+
+  }
+  .tm-form .form-group input::placeholder{
+    color:  #6B7280;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 26.24px;
+  }
+  .sign-up-notice{
+    color: var(--secondary);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 19.68px;
+  margin: 12px 0px 4px;
+  }
+  .tm-form .form-check{
+    margin-bottom: 4px;
+  }
+  .tm-form .form-check input{
+    border: 1px solid  #252C32;
+    border-radius: 0px;
+    margin-top: 5px;
+  }
+  .tm-form .form-check input:hover{
+   box-shadow: none;
+   outline: none;
+  }
+  .tm-form .form-check label{
+    color: var(--secondary);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22.96px;
+    margin-left: 10px;
+  }
+  .tm-dashboard-btn{
+    color: #FFF;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: -0.3px;
+    border-radius: 14px;
+background:  #1F305E;
+border: none;
+width: fit-content;
+padding: 18px 59px;
+align-self: flex-end;
+margin-top: 50px;
+  }
+  .tm-common-btn:hover{
+    color: #FFF;
+  background:  #428328;
+  }
+  .form-control:hover{
+    box-shadow: none;
+  border-color: inherit;
+  outline-width: 0px;
+  }
+  .tm-form-link-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .tm-settings-img-upload-area{
+    display: flex;
+    gap: 23px;
+    align-items: center;
+  }
+  .tm-settings-img-space{
+    width: 104px;
+height: 96px;
+  }
+  .tm-settings-img-space img{
+    width: 100%;
+height: 100%;
+object-fit: cover;
+  }
+/* settings.html end */
+
+/* responsive */
+  @media (min-width: 601px) and (max-width: 750px){
+    .tm-review-main-content-header {
+        gap: 13px;
+    }
+    .tm-review-main-content-header h2 {
+        font-size: 20px;
+        line-height: 28.24px;
+    }
+    .tm-review-main-content-lower {
+        font-size: 16px;
+        line-height: 30.8px;
+    }
+    .tm-review-main-content {
+        gap: 14px;
+    }
+    .tm-review-star-wrapper svg{
+        width: 15px;
+        height: 15px;
+    }
+  }
+  @media (min-width: 501px) and (max-width: 600px){
+    .form-field-wrapper {
+        display: flex;
+        gap: 15px;
+        flex-direction: column;
+    }
+    .tm-review-main-content-header {
+        gap: 13px;
+    }
+    .tm-review-main-content-header h2 {
+        font-size: 20px;
+        line-height: 28.24px;
+    }
+    .tm-review-main-content-lower {
+        font-size: 16px;
+        line-height: 23.8px;
+    }
+    .tm-review-main-content {
+        gap: 14px;
+    }
+    .tm-review-star-wrapper svg{
+        width: 15px;
+        height: 15px;
+    }
+  }
+  @media (max-width: 500px){
+    .tm-reviews-card-wrapper {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .tm-review-img-area {
+        width: 100%;
+    }
+    .tm-review-main-content-header h2 {
+        font-size: 20px;
+        line-height: 27.24px;
+    }
+    .tm-review-main-content-header {
+        gap: 10px;
+    }
+    .tm-review-main-content {
+        gap: 12px;
+    }
+    .tm-review-main-content-lower {
+        font-size: 15px;
+        line-height: 25.8px;
+    }
+
+    /* settings page */
+    .form-field-wrapper {
+        gap: 10px;
+        flex-direction: column;
+    }
+    .tm-form {
+        gap: 10px;
+    }
+    .tm-form .form-group input, .tm-form .input-group input {
+        padding: 15px;
+    }
+    .tm-form .form-group label {
+        font-size: 14px;
+    }
+    .tm-form .form-group input::placeholder{
+        font-size: 15px;
+      }
+      .tm-settings-img-upload-area {
+        flex-direction: column;
+        gap: 23px;
+        align-items: center;
+    } 
+}

@@ -1,0 +1,73 @@
+:host {
+  --color-fg-primary: #ff6600;
+  --color-fg-accent: #ff6600;
+  --day-width: 40px;
+  --day-height: 40px;
+}
+.container.inline {
+  width: 100%;
+  margin-top: 30px;
+  border-radius: 10px;
+}
+.calendar {
+  padding: 20px;
+}
+.calendar > .daynames-row > *,
+.calendar > .days-grid {
+  text-align: center;
+}
+.calendar > .daynames-row > *,
+.calendar > .days-grid > * {
+  border: 1px solid transparent;
+  border-radius: 2px;
+  min-height: var(--day-height);
+  height: var(--day-height);
+  max-height: var(--day-height);
+  min-width: var(--day-width);
+  width: var(--day-width);
+  max-width: var(--day-width);
+}
+.calendar > .daynames-row > .dayname {
+  margin-left: auto;
+  margin-right: auto;
+  color: #121212;
+  text-align: center;
+  font-weight: 400;
+}
+.calendar > .days-grid > .day {
+  cursor: pointer;
+  border-radius: 999px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #484848;
+  text-align: center;
+  font-weight: 400;
+}
+.calendar > .days-grid > .day.today {
+  border: 1px solid var(--color-fg-primary);
+}
+@media (max-width: 1199px) {
+  :host {
+    --day-width: 35px;
+    --day-height: 35px;
+  }
+}
+@media (max-width: 991px) {
+  :host {
+    --day-width: 30px;
+    --day-height: 30px;
+  }
+  .container.inline {
+    margin-top: 15px;
+  }
+}
+@media (max-width: 480px) {
+  .calendars .calendar > .days-grid > .day {
+    min-height: var(--day-height);
+    height: var(--day-height);
+    max-height: var(--day-height);
+    min-width: var(--day-width);
+    width: var(--day-width);
+    max-width: var(--day-width);
+  }
+}

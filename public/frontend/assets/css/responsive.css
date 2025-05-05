@@ -1,0 +1,101 @@
+/* ================================================================================= */
+/* all responsive styles start */
+/* ================================================================================= */
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575px) {
+}
+
+/* Small devices (landscape phones, less than 768px) */
+@media (max-width: 767px) {
+}
+
+/* Medium devices (tablets, less than 992px) */
+@media (max-width: 991px) {
+}
+
+/* Large devices (desktops, less than 1200px) */
+@media (max-width: 1199px) {
+}
+
+/* Extra large devices (large desktops, less than 1400px) */
+@media (max-width: 1399px) {
+}
+
+/* ================================================================================= */
+
+/* Extra small devices (phones, 0px to 575px) */
+@media (max-width: 575px) {
+}
+
+/* Small devices (576px to 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+}
+
+/* Medium devices (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+}
+
+/* Large devices (992px to 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+
+/* Extra large devices (1200px to 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+
+/* XXL devices (1400px and above) */
+@media (min-width: 1400px) {
+}
+/* ================================================================================= */
+/* all responsive styles start */
+/* ================================================================================= */
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575px) {
+}
+
+/* Small devices (landscape phones, less than 768px) */
+@media (max-width: 767px) {
+}
+
+/* Medium devices (tablets, less than 992px) */
+@media (max-width: 991px) {
+}
+
+/* Large devices (desktops, less than 1200px) */
+@media (max-width: 1199px) {
+}
+
+/* Extra large devices (large desktops, less than 1400px) */
+@media (max-width: 1399px) {
+}
+
+/* ================================================================================= */
+
+/* Extra small devices (phones, 0px to 575px) */
+@media (max-width: 575px) {
+}
+
+/* Small devices (576px to 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+}
+
+/* Medium devices (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+}
+
+/* Large devices (992px to 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+
+/* Extra large devices (1200px to 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+
+/* XXL devices (1400px and above) */
+@media (min-width: 1400px) {
+    .container{
+        max-width: 1320px;
+    }
+}

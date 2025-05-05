@@ -1,0 +1,345 @@
+/* Extra Small Devices (e.g., smartphones, portrait) */
+@media (min-width: 320px) and (max-width: 479px) {
+    .se--home--rental--search-section {
+        width: 300px;
+        height: 40px;
+        ;
+        padding: 16px 0px;
+
+        margin-top: 20px;
+
+    }
+
+    .se--serach-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .container {
+        width: 100%;
+        ;
+    }
+
+    .se--choose--plane-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .se--plan-box-pera {
+
+        font-size: 16px;
+
+    }
+
+    .se-choose--plan-box {
+        width: 90%;
+
+        gap: 10px;
+        padding: 12px 6px;
+
+    }
+
+    .se-choose--plan-box svg {
+        width: 20%;
+
+
+
+    }
+
+    .se--plan-box-header {
+
+        font-size: 20px;
+
+    }
+
+    .se--wrapper--section {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .se--homes--container {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr;
+
+
+    }
+
+    .se--houses--layout {
+        align-items: center;
+        gap: 10px;
+    }
+
+    .se--common-header {
+
+        font-size: 20px;
+
+    }
+
+    .se--section--header {
+
+        font-size: 20px;
+    }
+
+    .se--common--pera {
+
+        max-width: 100%;
+    }
+
+    .se--plan-box-pera {
+        font-size: 14px;
+    }
+
+    .se--banner-text-width {
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .provider-banner-content .banner-title {
+
+        line-height: 30px;
+    }
+
+    .se--houses-col--1 {
+
+        gap: 1px;
+    }
+
+    .se--choose--your-services {
+
+        gap: 20px;
+    }
+    .se--common--pera2 {
+     
+        font-size: 14px;
+      
+    }
+    .se--link {
+       
+        font-size: 14px;
+      
+    }
+    .se--adress--info {
+        
+        font-size: 16px;
+       
+    }
+    .se--home--card--details {
+    
+        font-size: 14px;
+    }
+    .se--house--card--info {
+       
+        gap: 2px;
+       
+    }
+    .se--add--service{
+       padding: 8px 16px;
+       font-size: 14px;
+       }
+      
+
+}
+
+/* Small Devices (e.g., smartphones, landscape) */
+@media (min-width: 480px) and (max-width: 767px) {
+    .se--home--rental--search-section {
+        width: 400px;
+        height: 58px;
+        ;
+        padding: 16px 0px;
+
+    }
+    .se--common--pera {
+        
+        max-width: 100%;
+    }
+    .se--choose--your-services {
+   
+        gap: 20px;
+    }
+
+    .se--choose--plane-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .se--plan-box-pera {
+
+        font-size: 16px;
+
+    }
+
+    .se-choose--plan-box {
+        width: 70%;
+        gap: 20px;
+        padding: 24px 0px;
+
+    }
+
+    .se--plan-box-header {
+
+        font-size: 24px;
+
+    }
+
+    .se--wrapper--section {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .se--section--header {
+
+        font-size: 26px;
+    }
+
+    .se--homes--container {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 400px;
+
+        justify-items: center;
+        align-items: center;
+
+
+    }
+
+    .se--houses--layout {
+        align-items: center;
+    }
+
+    .se--common-header {
+
+        font-size: 22px;
+
+    }
+    .se--choose--your-services {
+
+        gap: 20px;
+    }
+    .se--common--pera2 {
+     
+        font-size: 14px;
+      
+    }
+    .se--link {
+       
+        font-size: 14px;
+      
+    }
+    .se--adress--info {
+        
+        font-size: 16px;
+       
+    }
+    .se--home--card--details {
+    
+        font-size: 14px;
+    }
+    .se--house--card--info {
+       
+        gap: 2px;
+       
+    }
+    .se--add--service{
+        padding: 8px 16px;
+        font-size: 14px;
+        }
+       
+
+}
+
+/* Medium Devices (e.g., tablets, portrait) */
+@media (min-width: 768px) and (max-width: 1023px) {
+
+    .se--plan-box-pera {
+
+        font-size: 16px;
+
+    }
+
+    .se-choose--plan-box {
+        gap: 20px;
+        padding: 14px 0px;
+    }
+
+    .se--plan-box-header {
+
+        font-size: 24px;
+
+    }
+
+    .se--wrapper--section {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .se--section--header {
+
+        font-size: 32px;
+    }
+
+    .se--common-header {
+
+        font-size: 28px;
+
+    }
+    .se--common--pera {
+        
+        max-width: 100%;
+    }
+    .se--adress--info {
+        
+        font-size: 16px;
+       
+    }
+    .se--home--card--details {
+    
+        font-size: 14px;
+    }
+    .se--house--card--info {
+       
+        gap: 2px;
+       
+    }
+    .se--plan-box-pera {
+       
+        font-size: 14px;
+       
+    }
+    .se--add--service{
+        padding: 12px 20px;
+        font-size: 16px;
+        }
+
+}
+
+/* Large Devices (e.g., tablets, landscape and small desktops) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .se--section--header {
+
+        font-size: 38px;
+    }
+    .se--plan-box-pera {
+       
+        font-size: 14px;
+       
+    }
+    .se--add--service{
+        padding: 12px 20px;
+        font-size: 16px;
+        }
+
+}
+
+/* Extra Large Devices (e.g., desktops, large screens) */
+@media (min-width: 1280px) and (max-width: 1600px) {
+    /* Styles for 1280px to 1600px */
+}
