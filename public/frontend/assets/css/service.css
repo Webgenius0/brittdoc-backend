@@ -1,0 +1,507 @@
+.se--banner-text-width {
+  max-width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.se--home-rental-banner {
+  height: 600px;
+  width: 100%;
+  background-image: url("../images/home-rental.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  position: relative;
+  padding-top: 50px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.se--home--rental--search-section {
+  width: 493px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  opacity: 0.6;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(16.5px);
+  padding: 16px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.se--serach--container {
+  margin-top: 20px;
+}
+
+.se--search--input {
+  width: 100%;
+  border: none;
+  outline: none;
+  color: black;
+  /* Boday Text/RE4 */
+  font-family: Poppins;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 164%;
+  /* 26.24px */
+  background-color: transparent;
+  margin-left: 10px;
+}
+
+.se--search--input::placeholder {
+  color: #fff;
+}
+
+.se--serach-icon {
+  width: 79px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--Primary-40, #f60);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.se--wrapper--section {
+  margin-top: 60px;
+  margin-bottom: 60px;
+}
+
+.se--choose--your-services {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.se--choose-col-1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.se--common-header {
+  color: var(--Background-Color-Blue, #036);
+  /* Heading/Bold/H6 */
+  font-family: Poppins;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 164%;
+  /* 52.48px */
+}
+
+.se--common--pera {
+  color: var(--Secondary-70, #757575);
+  text-align: center;
+
+  /* Boday Text/RE4 */
+  font-family: Poppins;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 164%;
+  /* 26.24px */
+  max-width: 50%;
+}
+
+.se--choose--plane-container {
+  display: flex;
+  gap: 19px;
+}
+
+.se-choose--plan-box {
+  display: flex;
+  padding: 34px 23px;
+  width: 50%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  border-radius: 16px;
+  /* background: var(--Primary-40, #F60); */
+  border-radius: 16px;
+  background: var(--Background-Color-White, #fff);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+.se-choose--plan-box:hover {
+  background: var(--Primary-40, #f60);
+}
+.home_svg {
+  fill: #003366;
+}
+
+.se-choose--plan-box:hover .home_svg {
+  fill: white;
+}
+.se-choose--plan-box:hover .se--plan-box-header {
+  color: white;
+}
+.se-choose--plan-box:hover .se--plan-box-pera {
+  color: white;
+}
+
+.se--plan-box-header {
+  color: #036;
+  text-align: center;
+
+  /* Heading/Bold/H6 */
+  font-family: Poppins;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 164%;
+  /* 52.48px */
+}
+
+.se--header-black {
+  color: #036;
+
+  /* 52.48px */
+}
+
+.se--plan-box-pera {
+  color: #036;
+  text-align: center;
+
+  /* Boday Text/RE3 */
+  font-family: Poppins;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 164%;
+  /* 29.52px */
+  width: 62%;
+}
+
+.se--pera--black {
+  color: #036;
+}
+
+.se-white {
+}
+
+.se--houses--layout {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.se--houses-col--1 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.se--section--header {
+  color: var(--Background-Color-Blue, #036);
+  font-family: Poppins;
+  font-size: 48px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 164%;
+  /* 78.72px */
+}
+
+.se--common--pera2 {
+  color: var(--Secondary-70, #757575);
+
+  /* Boday Text/RE4 */
+  font-family: Poppins;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 164%;
+}
+
+.se--link {
+  color: var(--Primary-40, #f60);
+
+  /* Boday Text/RE3 */
+  font-family: Poppins;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 164%;
+}
+
+.se--homes--container {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.se--home--card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  background: var(--Background-Color-White, #fff);
+  box-shadow: 0px 4px 16px 0px rgba(133, 133, 133, 0.12);
+  transition: all 0.3s ease;
+}
+
+.se--fav--icon--box {
+  display: flex;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.se--house--card--info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0px;
+  transition: all 0.3s ease;
+}
+
+.se--house--location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.se--adress--info {
+  color: var(--Background-Color-Blue, #036);
+  text-align: center;
+
+  font-family: Poppins;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 164%;
+  /* 32.8px */
+}
+
+.se--home--card--details {
+  color: var(--Background-Color-Blue, #036);
+  text-align: center;
+
+  /* Boday Text/RE4 */
+  font-family: Poppins;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 164%;
+  /* 26.24px */
+  transition: all 0.3s ease;
+}
+
+.se--home--card:hover {
+  transform: scale(1.04);
+  background: #003366;
+}
+
+.se--home--card:hover .se--home--card--details {
+  color: #fff;
+}
+
+.se--home--card:hover .se--adress--info {
+  color: #fff;
+}
+
+.se--home--card--svg {
+  stroke: #003366;
+}
+
+.se--home--card:hover .se--home--card--svg {
+  stroke: #fff;
+}
+
+.se--bottom {
+  margin-bottom: 40px;
+}
+
+.se--home-rental-banner2 {
+  height: 600px;
+  width: 100%;
+  background-image: url("../images/home-rental.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  position: relative;
+  padding-top: 50px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.se--car-rental-banner {
+  height: 600px;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  position: relative;
+  padding-top: 50px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.se--food--order--banner {
+  height: 600px;
+  width: 100%;
+  background-image: url("../images/foodBanner.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  position: relative;
+  padding-top: 50px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.se--checkField {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0px;
+}
+.se--remember {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.se--remember label {
+  color: #7b7b7b;
+  font-size: 16px;
+}
+.se--forogot {
+  text-decoration: underline;
+}
+.se--checkField a {
+  color: #036;
+}
+.se--new-user {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.se--new-user a {
+  color: #036;
+}
+
+/* Style for OTP Container */
+.otp-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Style for OTP Container */
+.otp-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Style for each OTP input field */
+.otp-field {
+  display: flex;
+  width: 86px;
+  padding: 12px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  background: #f5f8fa;
+}
+
+.otp-input {
+  width: 100%;
+  font-size: 40px;
+  font-weight: 600;
+  text-align: center;
+  background: transparent;
+  outline: none;
+  border: none;
+}
+
+/* Optional: Focus style for better UX */
+.otp-input:focus {
+  border-color: #4a90e2;
+  outline: none;
+}
+
+/* Button Style */
+.button {
+  background-color: #f60;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+#imagePreviewContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.image-container {
+  position: relative;
+  width: 300px; /* You can adjust the size as needed */
+  height: 200px; /* You can adjust the size as needed */
+  overflow: hidden;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px; /* Optional: rounded corners */
+}
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.dragover {
+  border: 2px dashed #ff6600;
+}
