@@ -33,13 +33,13 @@ $systemSetting = App\Models\SystemSetting::first();
                 <span class="menu-title-text">APPS</span>
             </li>
             <!-- Contact Support Message Menu Item -->
-            <li class="menu-item open">
+            {{-- <li class="menu-item open">
                 <a href="{{ route('admin_contact_us.index') }}"
                     class="menu-link {{ request()->routeIs('admin_contact_us.index') ? 'active' : '' }}">
                     <span class="material-symbols-outlined menu-icon">content_paste</span>
                     <span class="title">Contact Support Message</span>
                 </a>
-            </li>
+            </li> --}}
             <!-- Faqs Menu Item -->
             <li class="menu-item {{ request()->routeIs('faqs.*') ? 'open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle active">
