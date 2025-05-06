@@ -132,7 +132,7 @@ $systemSetting = App\Models\SystemSetting::first();
             <li class="menu-item {{ request()->routeIs('cms.home_page.*') ? 'open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle active">
                     <span class="material-symbols-outlined menu-icon">handshake</span>
-                    <span class="title">Home Page</span>
+                    <span class="title">Social Info</span>
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
