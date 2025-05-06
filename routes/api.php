@@ -54,6 +54,10 @@ Route::post('/payments-create/stripe', [StripePaymentController::class, 'handleW
 
 // only for user and host
 Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venue_holder']], function ($router) {
+    //notification
+    Route::get('/notification-settings', [UserController::class, 'getNotificationSettings']);
+    Route::post('/notification-settings', [UserController::class, 'notificationSettings']);
+    //contact support and faqs
     Route::get('/faqs', [UserFaqController::class, 'index']);
     Route::post('/contact-support-message/sent', [UserContactSupportController::class, 'store']);
     // --------- cms part --------------
