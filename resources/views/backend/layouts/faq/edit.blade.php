@@ -81,8 +81,8 @@
                             <label class="label text-secondary">Type Select</label>
                             <div class="form-group position-relative">
                                 <select name="type" class="form-control text-dark ps-5 h-55 @error('type') is-invalid @enderror">
-                                    <option value="user" {{ old('type', $data->type ?? '') == 'user' ? 'selected' : '' }}>user</option>
-                                    <option value="host" {{ old('type', $data->type ?? '') == 'host' ? 'selected' : '' }}>host</option>
+                                    <option value="entertainer" {{ old('type', $data->type ?? '') == 'entertainer' ? 'selected' : '' }}>entertainer</option>
+                                    <option value="venue_holder" {{ old('type', $data->type ?? '') == 'venue_holder' ? 'selected' : '' }}>venue_holder</option>
                                 </select>
                             </div>
                             @error('type')
