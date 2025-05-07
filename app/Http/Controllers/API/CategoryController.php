@@ -8,109 +8,83 @@ use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use App\Helpers\Helper;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
     public function index(Request $request)
     {
         try {
-            // Get 'per_page' from the request or default to 1000
-            $per_page = $request->has('per_page') ? $request->per_page : 1000;
+            $search = $request->query('search', '');
+            $per_page = $request->query('per_page', 100);
 
-            $categories = Category::where('status', 'active')->select('id', 'title', 'thumbnail', 'description')->paginate($per_page);
+            // Build the base query
+            $query = Category::where('status', 'active')
+                ->select('id', 'name', 'image', 'type');
+
+            // Add search conditions if search term exists
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('type', 'like', "%{$search}%");
+                });
+            }
+
+            // Execute pagination on the complete query
+            $categories = $query->paginate($per_page);
+            if (!empty($search) && $categories->isEmpty()) {
+                return Helper::jsonResponse(false, 'No categories found for the given search.', 404);
+            }
+
             return Helper::jsonResponse(true, 'Categories retrieved successfully.', 200, $categories, true);
-        } catch (\Exception $e) {
-            return Helper::jsonErrorResponse('Failed to retrieve categories', 403);
+        } catch (Exception $e) {
+            Log::error("CategoryController::index" . $e->getMessage());
+            return Helper::jsonErrorResponse('Failed to retrieve categories', 500);
         }
     }
+
+
+
+    public function create(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name',
+                'type' => 'required|in:venue_holder,entertainer',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]);
+
+            if ($request->hasFile('image')) {
+                $validatedData['image'] = Helper::fileUpload($request->file('image'), 'category', time() . '_' . getFileName($request->file('image')));
+            }
+            $categories = Category::Create($validatedData);
+            return response()->json([
+                "success" => true,
+                "message" => "Category created successfully",
+                "categories" => $categories
+            ]);
+        } catch (Exception $e) {
+            Log::error("CategoryController::store" . $e->getMessage());
+            return response()->json([
+                "success" => false,
+                // "message" => "Category not create"
+                "message" => $e->getMessage()
+            ]);
+        }
+    }
+
+
     public function show(Request $request, string $id)
     {
         try {
-            $category = Category::select('id', 'title', 'thumbnail', 'description')
-                ->with(['subCategories:id,category_id,title,thumbnail'])
-                ->find($id);
+            $category = Category::select('id', 'name', 'image', 'type')->find($id);
+
             if (!$category) {
                 return Helper::jsonErrorResponse('Category not found', 404);
             }
-
             return Helper::jsonResponse(true, 'Category retrieved successfully.', 200, $category);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return Helper::jsonErrorResponse('Failed to retrieve category', 500);
         }
     }
-    public function getSubCategories(Request $request)
-    {
-        try {
-            // Get 'per_page' from the request or default to 1000
-            $per_page = $request->has('per_page') ? $request->per_page : 1000;
-            $sub_categories = SubCategory::select('id', 'title', 'thumbnail', 'description')
-                ->paginate($per_page);
-
-            return Helper::jsonResponse(true, 'Category retrieved successfully.', 200, $sub_categories);
-        } catch (\Exception $e) {
-            return Helper::jsonErrorResponse('Failed to retrieve category', 500);
-        }
-    }
-    public function getSubCategory(Request $request, string $id)
-    {
-        try {
-            $category = SubCategory::where('status', 'active')->select('id', 'title', 'thumbnail', 'description')
-                ->find($id);
-            if (!$category) {
-                return Helper::jsonErrorResponse('Category not found', 404);
-            }
-
-            return Helper::jsonResponse(true, 'Category retrieved successfully.', 200, $category);
-        } catch (\Exception $e) {
-            return Helper::jsonErrorResponse('Failed to retrieve category', 500);
-        }
-    }
-    public function searchingCategory(Request $request)
-{
-    try {
-        // Get the search keyword from the request
-        $search = $request->input('search', '');
-
-        // Query for categories
-        $categoryQuery = Category::where('status', 'active')
-            ->select('id', 'title', 'thumbnail', 'description')
-            ->where(function ($query) use ($search) {
-                // If a search term is provided, search in category title or description
-                if ($search) {
-                    $query->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-                }
-            });
-
-        // Query for subcategories
-        $subCategoryQuery = SubCategory::where('status', 'active')
-            ->select('id', 'title', 'thumbnail', 'description')
-            ->where(function ($query) use ($search) {
-                // If a search term is provided, search in subcategory title or description
-                if ($search) {
-                    $query->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-                }
-            });
-
-        // Fetch the results
-        $categories = $categoryQuery->get();
-        $subCategories = $subCategoryQuery->get();
-
-        // Check if no data is found
-        if ($categories->isEmpty() && $subCategories->isEmpty()) {
-            return Helper::jsonResponse(false, 'No categories or subcategories found for the given search.', 404);
-        }
-
-        // Return the combined results
-        return Helper::jsonResponse(true, 'Search data fetched successfully.', 200, [
-            'categories' => $categories,
-            'subCategories' => $subCategories
-        ]);
-    } catch (Exception $e) {
-        // Return error response if an exception occurs
-        return Helper::jsonErrorResponse('Something went wrong.', 403);
-    }
-}
-
 }

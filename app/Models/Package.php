@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Pakage extends Model
+class Package extends Model
 {
     // Define the table name if it's not the default
     protected $table = 'pakages';
@@ -14,6 +14,7 @@ class Pakage extends Model
         'title',
         'description',
         'price',
+        'billing_cycle',
         'duration',
         'status'
     ];
@@ -21,6 +22,7 @@ class Pakage extends Model
     protected $casts = [
         'title' => 'string',
         'description' => 'string',
+        'billing_cycle' => 'string',
         'price' => 'decimal:2',
         'duration' => 'integer',
         'status' => 'string',
@@ -29,6 +31,6 @@ class Pakage extends Model
 
     public function subscriptions()
     {
-        return $this->hasMany(Subcription::class);  // Assuming a package can have many subscriptions
+        return $this->hasMany(Subcription::class);
     }
 }

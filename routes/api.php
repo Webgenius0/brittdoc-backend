@@ -7,11 +7,12 @@ use App\Http\Controllers\API\Auth\LogoutController;
 use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\Auth\UserController;
+use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\Entertrainer\EventController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
 use App\Http\Controllers\API\V1\User\StripePaymentController;
 use App\Http\Controllers\API\V1\User\UserContactSupportController;
 use App\Http\Controllers\API\V1\User\UserFaqController;
-
 use Illuminate\Support\Facades\Route;
 
 
@@ -26,9 +27,7 @@ Route::group(['middleware' => 'guest:api'], function ($router) {
     //forgot password
     Route::post('/forget-password', [ResetPasswordController::class, 'forgotPassword']);
     Route::post('/verify-otp', [ResetPasswordController::class, 'VerifyOTP']);
-    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);
-    ;
-
+    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);;
 });
 
 Route::group(['middleware' => 'auth:api'], function ($router) {
@@ -38,23 +37,18 @@ Route::group(['middleware' => 'auth:api'], function ($router) {
     Route::post('/update-profile', [UserController::class, 'updateProfile']);
     Route::post('/update-password', [UserController::class, 'changePassword']);
     Route::delete('/delete-profile', [UserController::class, 'deleteProfile']);
-
 });
 
 
 // only for user
-Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router) {
-
-});
+Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router) {});
 
 //only for entertrainer
-Route::group(['middleware' => ['auth:api', 'check_is_entertrainer']], function ($router) {
+Route::group(['middleware' => ['auth:api', 'check_is_entertrainer']], function ($router) {});
 
-});
+
 //only for venue holder
-Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function ($router) {
-
-});
+Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function ($router) {});
 
 
 //payments webhook
@@ -76,3 +70,16 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::get("dynamic-pages", [HomePageController::class, "getDynamicPages"]);
     Route::get("dynamic-pages/single/{slug}", [HomePageController::class, "showDaynamicPage"]);
 });
+
+
+//Category API
+Route::get('/category', [CategoryController::class, 'index']);
+Route::post('/category/create', [CategoryController::class, 'create']);
+Route::get('/category/show/{id}', [CategoryController::class, 'show']);
+
+// //Entertrainer API Resources
+Route::get('/event', [EventController::class, "index"])->middleware('auth:api');
+Route::post('/event/create', [EventController::class, "create"])->middleware('auth:api');
+Route::get('/event/edit/{id}', [EventController::class, "edit"])->middleware('auth:api');
+Route::post('/event/update/{id}', [EventController::class, "update"])->middleware('auth:api');
+Route::delete('/event/delete/{id}', [EventController::class, "destroy"])->middleware('auth:api');

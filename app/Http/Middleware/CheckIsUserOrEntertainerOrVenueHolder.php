@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\Helper;
-use Auth;
+// use Auth;
+use Illuminate\Support\Facades\Auth;
+
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
