@@ -8,11 +8,11 @@ use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\Entertrainer\EventController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
 use App\Http\Controllers\API\V1\User\StripePaymentController;
 use App\Http\Controllers\API\V1\User\UserContactSupportController;
 use App\Http\Controllers\API\V1\User\UserFaqController;
-
 use Illuminate\Support\Facades\Route;
 
 
@@ -45,6 +45,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
 
 //only for entertrainer
 Route::group(['middleware' => ['auth:api', 'check_is_entertrainer']], function ($router) {});
+
+
 //only for venue holder
 Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function ($router) {});
 
@@ -74,3 +76,10 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
 Route::get('/category', [CategoryController::class, 'index']);
 Route::post('/category/create', [CategoryController::class, 'create']);
 Route::get('/category/show/{id}', [CategoryController::class, 'show']);
+
+// //Entertrainer API Resources
+Route::get('/event', [EventController::class, "index"])->middleware('auth:api');
+Route::post('/event/create', [EventController::class, "create"])->middleware('auth:api');
+Route::get('/event/edit/{id}', [EventController::class, "edit"])->middleware('auth:api');
+Route::post('/event/update/{id}', [EventController::class, "update"])->middleware('auth:api');
+Route::delete('/event/delete/{id}', [EventController::class, "destroy"])->middleware('auth:api');

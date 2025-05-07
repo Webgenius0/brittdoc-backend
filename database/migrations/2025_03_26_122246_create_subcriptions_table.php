@@ -10,10 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        
         Schema::create('subcriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('pakage_id')->nullable()->constrained('pakages')->onDelete('cascade');
+            // $table->foreignId('package_id')->nullable()->constrained('pakages')->onDelete('cascade');
             $table->date('start_date');
             $table->date('end_date');
             $table->enum('status', ['pending','active', 'inactive', 'cancelled'])->default('pending');
