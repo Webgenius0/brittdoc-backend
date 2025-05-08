@@ -120,7 +120,7 @@ class EventController extends Controller
     public function edit(Request $request, $id)
     {
         try {
-            $event = Event::find($id);
+            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -148,7 +148,7 @@ class EventController extends Controller
     {
         // dd($request->all());
         try {
-            $event = Event::find($id);
+            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -204,7 +204,7 @@ class EventController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            $event = Event::find($id);
+            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
