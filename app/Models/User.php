@@ -82,6 +82,24 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
+
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+
+    public function venues()
+    {
+        return $this->hasMany(Venue::class);
+    }
+    public function event()
+    {
+        return $this->hasMany(Event::class);
+    }
+
+
     /**
      * Get the attributes that should be cast.
      *

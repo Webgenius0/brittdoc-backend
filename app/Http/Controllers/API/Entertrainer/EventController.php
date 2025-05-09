@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Entertrainer;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Event;
 use Exception;
 use Illuminate\Http\Request;
@@ -68,11 +69,20 @@ class EventController extends Controller
                 $image = Helper::fileUpload($request->file('image'), 'Event', time() . '_' . getFileName($request->file('image')));
             }
 
+            // check if the category is valid for venue holders
+            $category = Category::where('id', $request->category_id)
+                ->where('type', 'entertainer')
+                ->first();
+
+            if (!$category) {
+                return Helper::jsonResponse(false, 'Selected category is not valid for entertainer', 422);
+            }
+
             $data = Event::create([
                 'user_id' => Auth::user()->id,
                 'name' => $request->input('name'),
                 'location' => $request->input('location'),
-                'category_id' => $request->input('category_id'),
+                'category_id' => $category->id,
                 'price' => $request->input('price'),
                 'about' => $request->input('about'),
                 'available_date' => $request->input('available_date'),
@@ -89,7 +99,7 @@ class EventController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                // 'message' => 'Event not created',
+                'message' => 'Event not created',
                 'message' => $e->getMessage(),
             ]);
         }
@@ -110,7 +120,25 @@ class EventController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $event = Event::where('id', $id)->with('user')->first();
+            if (!$event) {
+                return Helper::jsonResponse(false, 'Event ID  not found.', 404);
+            }
+           return response()->json([
+                'success' => true,
+                'message' => 'Event retrieved Details successfully',
+                'data' => $event,
+            ]);
+        } catch (Exception $e) {
+            // Log::error("EventController::show" . $e->getMessage());
+            // return Helper::jsonErrorResponse('Failed to retrieve Event', 500);
+             return response()->json([
+                'error' => false,
+                'message' => 'Event not found',
+                $e->getMessage()
+            ]);
+        }
     }
 
 
@@ -120,7 +148,7 @@ class EventController extends Controller
     public function edit(Request $request, $id)
     {
         try {
-            $event = Event::find($id);
+            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -148,7 +176,7 @@ class EventController extends Controller
     {
         // dd($request->all());
         try {
-            $event = Event::find($id);
+            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -168,14 +196,28 @@ class EventController extends Controller
                 'image' => 'nullable|image|max:2048',
             ]);
 
-            if ($request->file('image')) {
+            // check if the category is valid for venue holders
+            $category = Category::where('id', $request->category_id)
+                ->where('type', 'entertainer')
+                ->first();
+
+            if (!$category) {
+                return Helper::jsonResponse(false, 'Selected category is not valid for entertainer', 422);
+            }
+
+            if ($request->hasFile('image')) {
+                // Delete old image
+                if ($event->image) {
+                    Helper::fileDelete($event->image);
+                }
+                // Upload new image
                 $image = Helper::fileUpload($request->file('image'), 'Event', time() . '_' . getFileName($request->file('image')));
             }
 
             $event->update([
                 'name' => $request->input('name'),
                 'location' => $request->input('location'),
-                'category_id' => $request->input('category_id'),
+                'category_id' => $category->id,
                 'price' => $request->input('price'),
                 'about' => $request->input('about'),
                 'available_date' => $request->input('available_date'),
@@ -192,7 +234,7 @@ class EventController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                // "message" => "Event not updated",
+                "message" => "Event not updated",
                 "message" => $e->getMessage()
             ]);
         }
@@ -204,7 +246,7 @@ class EventController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            $event = Event::find($id);
+            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -225,7 +267,7 @@ class EventController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete event',
-                // 'error' => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
     }
