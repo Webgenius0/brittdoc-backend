@@ -65,6 +65,31 @@ $systemSetting = App\Models\SystemSetting::first();
                 </ul>
             </li>
             
+            <!-- Category Menu Item -->
+            <li class="menu-item {{ request()->routeIs('category.*') ? 'open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle active">
+                    <span class="material-symbols-outlined">category</span>
+                    <span class="title">Category</span>
+                </a>
+                <ul class="menu-sub">
+                    <!-- Account Settings Submenu -->
+                    <li class="menu-item ">
+                        <a href="{{ route('category.index') }}"
+                            class="menu-link {{ request()->routeIs('category.index') ? 'active' : '' }} ">
+                            Category List
+                        </a>
+                    </li>
+                    <!-- Change Password Submenu -->
+                    <li class="menu-item">
+                        <a href="{{ route('category.create') }}"
+                            class="menu-link {{ request()->routeIs('category.create') ? 'active' : '' }}">
+                            Add New Category
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            
 
 
             <li class="menu-title small text-uppercase">
@@ -124,6 +149,21 @@ $systemSetting = App\Models\SystemSetting::first();
 
                 </ul>
             </li>
+            <!-- dynamic page Menu Item -->
+            <li class="menu-item {{ request()->routeIs('privacy.*') ? 'open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle active">
+                    <span class="material-symbols-outlined">visibility</span>
+                    <span class="title">privacy Policy</span>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item">
+                        <a href="{{ route('privacy.index') }}"
+                            class="menu-link {{ request()->routeIs('dynamic_page.index') ? 'active' : '' }}">
+                            Privacy Policy
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
             <li class="menu-title small text-uppercase">
                 <span class="menu-title-text">CMS</span>
@@ -132,7 +172,7 @@ $systemSetting = App\Models\SystemSetting::first();
             <li class="menu-item {{ request()->routeIs('cms.home_page.*') ? 'open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle active">
                     <span class="material-symbols-outlined menu-icon">handshake</span>
-                    <span class="title">Home Page</span>
+                    <span class="title">Social Info</span>
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">

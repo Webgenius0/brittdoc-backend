@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_check' => \App\Http\Middleware\RoleCheckMiddleWare::class,
             'check_anonymous_user' => \App\Http\Middleware\checkAnonymousUser::class,
             'check_is_user' => \App\Http\Middleware\CheckIsUser::class,
-            'check_is_entertrainer' => \App\Http\Middleware\CheckIsEntertrainer::class,
+            'check_is_entertainer' => \App\Http\Middleware\CheckIsEntertrainer::class,
             'check_is_venue_holder' => \App\Http\Middleware\CheckIsVenueHolder::class,
             'check_is_user_or_entertainer_or_venue_holder' => \App\Http\Middleware\CheckIsUserOrEntertainerOrVenueHolder::class,
         ]);

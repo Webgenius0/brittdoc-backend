@@ -43,7 +43,7 @@
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllRead()">
                                 
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-count">
-                                    {{ Auth::user()->notifications()->whereNull('read_at')->count() }}
+                                    {{-- {{ Auth::user()->notifications()->whereNull('read_at')->count() }} --}}
                                 </span>
                                 
                                 <span class="material-symbols-outlined">notifications</span>

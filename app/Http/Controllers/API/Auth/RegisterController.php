@@ -38,7 +38,8 @@ class RegisterController extends Controller
         ]);
 
         try {
-            $otp = rand(1000, 9999);
+            // $otp = rand(1000, 9999); // for testing its off
+            $otp = 1234; // for testing its on
             $otpExpiresAt = Carbon::now()->addMinutes(60); // 1 hour
 
             // Check for soft-deleted user

@@ -4,20 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('pakages', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('slug')->unique();
+            $table->string('name')->unique();
             $table->string('image')->nullable();
-            $table->longText('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->integer('duration')->default(30); // Duration in days
+            $table->enum('type',['entertainer','venue_holder']);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
@@ -28,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('pakages');
+        Schema::dropIfExists('categories');
     }
 };

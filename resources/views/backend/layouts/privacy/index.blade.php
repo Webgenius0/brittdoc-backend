@@ -14,7 +14,7 @@
 
     <div class="main-content-container overflow-hidden">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-            <h3 class="mb-0">Faq Page</h3>
+            <h3 class="mb-0">Privacy Policy Page</h3>
 
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                 <ol class="breadcrumb align-items-center mb-0 lh-1">
@@ -25,10 +25,10 @@
                         </a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <span class="fw-medium">Faq Page</span>
+                        <span class="fw-medium">Privacy Policy Page</span>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <span class="fw-medium">Add</span>
+                        <span class="fw-medium">Privacy Policy </span>
                     </li>
                 </ol>
             </nav>
@@ -39,63 +39,48 @@
 
 
                 <div class="mb-4">
-                    <h4 class="fs-20 mb-1">Faq Create Page</h4>
-                    <p class="fs-15">Add New Faq Create here.</p>
+                    <h4 class="fs-20 mb-1">Privacy Policy Page</h4>
+                    <p class="fs-15">Privacy Policy Create Or Update here.</p>
                 </div>
                 {{-- from start --}}
-                <form action="{{ route('faqs.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('privacy.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('POST')
                     <div class="row">
-                        
+
                         <div class="col-lg-12">
                             <div class="form-group mb-4">
-                                <label class="label text-secondary">Faq Question</label>
+                                <label class="label text-secondary">Section Name</label>
                                 <div class="form-group position-relative">
                                     <input type="text"
-                                        class="form-control text-dark ps-5 h-55 @error('question') is-invalid @enderror"
-                                        name="question" value="{{ old('question') }}"
-                                        placeholder="Enter Faq Question here">
+                                        class="form-control text-dark ps-5 h-55 @error('name') is-invalid @enderror"
+                                        name="name" value="{{ old('name',$data->name) }}" placeholder="Enter section name here">
 
                                 </div>
-                                @error('question')
-                                    <div id="question-error" class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group mb-4">
-                                <label class="label text-secondary">Faq Answer</label>
-                                <div class="form-group position-relative">
-                                    <textarea name="answer" class="form-control @error('answer') is-invalid @enderror" id="answer"
-                                        placeholder="Faq Answer here">{{ old('answer') }}</textarea>
-                                </div>
-                                @error('answer')
-                                    <div id="answer-error" class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group mb-4">
-                                <label class="label text-secondary">Type Select</label>
-                                <div class="form-group position-relative">
-                                    <select name="type" class="form-control text-dark ps-5 h-55 @error('type') is-invalid @enderror">
-                                        <option value="entertainer">entertainer</option>
-                                        <option value="venue_holder">venue_holder</option>
-                                    </select>
-                                </div>
-                                @error('type')
-                                    <div id="type-error" class="text-danger">{{ $message }}</div>
+                                @error('name')
+                                    <div id="name-error" class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
 
+                        <div class="col-lg-12">
+                            <div class="form-group mb-4">
+                                <label class="label text-secondary">Description</label>
+                                <div class="form-group position-relative">
+                                    <textarea name="description" class="form-control @error('description') is-invalid @enderror" id="page_content"
+                                        placeholder="description here">{{ old('description',$data->description) }}</textarea>
+                                </div>
+                                @error('description')
+                                    <div id="description-error" class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-lg-12">
                             <div class="d-flex flex-wrap gap-3">
                                 <button type="reset" class="btn btn-danger py-2 px-4 fw-medium fs-16 text-white"
-                                    onclick="window.location.href='{{ route('faqs.index') }}'">Cancel</button>
+                                    onclick="window.location.href='{{ route('privacy.index') }}'">Cancel</button>
                                 <button type="submit" class="btn btn-primary py-2 px-4 fw-medium fs-16"> <i
                                         class="ri-check-line text-white fw-medium"></i> Submit</button>
                             </div>
@@ -111,8 +96,7 @@
     <script>
         ClassicEditor
             .create(document.querySelector('#page_content'), {
-                removePlugins: ['CKFinderUploadAdapter', 'CKFinder', 'EasyImage', 'ImageUpload', 'MediaEmbed'],
-                toolbar: ['bold', 'italic', 'heading', '|', 'undo', 'redo']
+                
             })
             .catch(error => {
                 console.error(error);

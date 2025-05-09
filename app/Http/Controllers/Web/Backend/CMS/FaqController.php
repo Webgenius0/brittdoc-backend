@@ -72,9 +72,9 @@ class FaqController extends Controller
         $validatedData = $request->validate([
             'question' => 'required|string|max:255',
             'answer' => 'required|string',
-            'type' => 'required|in:user,admin,host',
+            'type' => 'required|in:venue_holder,entertainer',
         ]);
-// dd($validatedData);
+        // dd($validatedData);
         try {
             Faq::Create($validatedData);
             flash()->success('Faq created Successfully');
@@ -112,7 +112,7 @@ class FaqController extends Controller
         $validatedData = $request->validate([
             'question' => 'required|string|max:255',
             'answer' => 'required|string',
-            'type' => 'required|in:user,admin,host',
+            'type' => 'required|in:entertainer,venue_holder',
         ]);
 
         try {

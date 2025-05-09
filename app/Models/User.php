@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable, SoftDeletes;
@@ -80,6 +81,24 @@ class User extends Authenticatable implements JWTSubject
         'status',
         'remember_token',
     ];
+
+
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+
+    public function venues()
+    {
+        return $this->hasMany(Venue::class);
+    }
+    public function event()
+    {
+        return $this->hasMany(Event::class);
+    }
+
 
     /**
      * Get the attributes that should be cast.
