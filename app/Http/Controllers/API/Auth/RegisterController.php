@@ -66,6 +66,13 @@ class RegisterController extends Controller
                 ]);
                 $user = $existingUser;
             } else {
+                //upload avatar photo
+                if ($request->hasFile('avatar')) {
+                    $avatar = Helper::fileUpload($request->file('avatar'), 'user/avatar', getFileName($request->file('avatar')));
+                } else {
+                    $avatar = 'uploads/avatar/avatar_defult.png';
+                }
+
                 $userData = [
                     'name' => $request->input('name'),
                     'email' => $request->input('email'),
@@ -74,6 +81,7 @@ class RegisterController extends Controller
                     'role' => $request->input('role'),
                     'otp' => $otp,
                     'otp_expires_at' => $otpExpiresAt,
+                    'avatar' => $avatar,
                 ];
             }
 
@@ -149,7 +157,6 @@ class RegisterController extends Controller
                 'token' => $token,
                 'data' => $user,
             ], 200);
-
         } catch (Exception $e) {
             Log::error('RegisterController::VerifyEmail' . $e->getMessage());
             return Helper::jsonErrorResponse('An error occurred during email verification.', 403);
@@ -194,11 +201,9 @@ class RegisterController extends Controller
                 $user->delete();
                 return Helper::jsonErrorResponse('Failed to send new OTP', 500);
             }
-
         } catch (Exception $e) {
             Log::error('RegisterController::ResendOtp' . $e->getMessage());
             return Helper::jsonErrorResponse('Something worng', 403);
         }
     }
-
 }
