@@ -60,6 +60,10 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('homePage/venue/show', [HomeController::class, "venue"]);
     //venue details show 
     Route::get('/homePage/venue/details/{id}', [HomeController::class, "venueDetails"]);
+    //user section venue details
+    Route::get('/user/venue/details/{id}', [VenueController::class, "VenueDetails"]);
+    Route::post('/user/venue/booking', [BookingController::class, "BookingVenue"]);
+    
 });
 
 //only for entertrainer
@@ -80,15 +84,11 @@ Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($
     Route::post('/event/booking/create', [BookingController::class, "create"]);
 });
 
-
-
 //only for venue holder
 Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function ($router) {
-    //
     //Category API
-    Route::get('/category', [CategoryController::class, 'index']);
-    Route::post('/category/create', [CategoryController::class, 'create']);
-    Route::get('/category/show/{id}', [CategoryController::class, 'show']);
+    Route::get('/venue_holder/category', [VenueController::class, 'SubCategory']);
+    Route::post('/venue_holder/category/create', [VenueController::class, 'SubCategoryCreate']);
     //venue API
     Route::get('/venue', [VenueController::class, "index"]);
     Route::post('/venue/create', [VenueController::class, "create"]);
@@ -96,6 +96,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function (
     Route::get('/venue/edit/{id}', [VenueController::class, "edit"]);
     Route::post('/venue/update/{id}', [VenueController::class, "update"]);
     Route::delete('/venue/delete/{id}', [VenueController::class, "destroy"]);
+    //venue booking Details
+
 });
 
 
