@@ -20,7 +20,8 @@ return new class extends Migration
             $table->string('location');
             $table->integer('capacity');
             $table->decimal('price', 10, 2);
-            $table->date('available_date');
+            $table->date('start_date');
+            $table->date('ending_date');
             $table->time('available_start_time');
             $table->time('available_end_time');
             $table->json('image')->nullable();

@@ -74,7 +74,9 @@ class HomeController extends Controller
 
 
     //venue details api 
-    public function venueDetails(Request $request){
-        //
+    public function venueDetails(Request $request, $id)
+    {
+        $venue = Venue::find($id);
+        return  $venue;
     }
 }

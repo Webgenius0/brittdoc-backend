@@ -58,13 +58,13 @@ class EventController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'price' => 'required|numeric|min:0',
                 'about' => 'required|string|max:1200',
-                'available_date' => 'required|date',
+                'start_date' => 'required|date',
+                'ending_date' => 'required|date|after_or_equal:start_date',
                 'available_start_time' => 'required|date_format:H:i',
-                'available_end_time' => 'required|date_format:H:i',
+                'available_end_time' => 'required|date_format:H:i|after:available_start_time',
                 'image' => 'nullable|image|max:2048',
                 'latitude' => 'required',
                 'longitude' => 'required',
-
             ]);
 
             // Create a new event input
@@ -88,7 +88,8 @@ class EventController extends Controller
                 'category_id' => $category->id,
                 'price' => $request->input('price'),
                 'about' => $request->input('about'),
-                'available_date' => $request->input('available_date'),
+                'start_date' => $request->input('start_date'),
+                'ending_date' => $request->input('ending_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
                 'latitude' => $request->input('latitude'),
@@ -195,9 +196,10 @@ class EventController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'price' => 'required|numeric|min:0',
                 'about' => 'required|string|max:1200',
-                'available_date' => 'required|date',
+                'start_date' => 'required|date',
+                'ending_date' => 'required|date|after_or_equal:start_date',
                 'available_start_time' => 'required|date_format:H:i',
-                'available_end_time' => 'required|date_format:H:i',
+                'available_end_time' => 'required|date_format:H:i|after:available_start_time',
                 'image' => 'nullable|image|max:2048',
                 'latitude' => 'required',
                 'longitude' => 'required',
@@ -227,7 +229,8 @@ class EventController extends Controller
                 'category_id' => $category->id,
                 'price' => $request->input('price'),
                 'about' => $request->input('about'),
-                'available_date' => $request->input('available_date'),
+                'start_date' => $request->input('start_date'),
+                'ending_date' => $request->input('ending_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
                 'latitude' => $request->input('latitude'),
@@ -278,6 +281,52 @@ class EventController extends Controller
                 'message' => 'Failed to delete event',
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+
+    public function SubCategory(Request $request)
+    {
+        try {
+            $category = Category::where('type', 'entertainer')->get();
+            return response()->json([
+                "success" => true,
+                "message" => "Sub-category created successfully",
+                "category" => $category
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                "failed" => false,
+                $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function SubCategoryCreate(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]);
+
+            $validatedData['type'] = 'entertainer';
+
+            if ($request->hasFile('image')) {
+                $validatedData['image'] = Helper::fileUpload($request->file('image'), 'category', time() . '_' . getFileName($request->file('image')));
+            }
+            $category = Category::create($validatedData);
+
+            return response()->json([
+                "success" => true,
+                "message" => "Sub-category created successfully",
+                "category" => $category
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                "failed" => false,
+                $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -59,16 +59,14 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('homePage/entertainer/show', [HomeController::class, "entertainer"]);
     Route::get('homePage/venue/show', [HomeController::class, "venue"]);
     //venue details show 
-    Route::get('homePage/venue/details', [HomeController::class, "venueDetails"]);
+    Route::get('/homePage/venue/details/{id}', [HomeController::class, "venueDetails"]);
 });
 
 //only for entertrainer
 Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($router) {
     //Category API
-    Route::get('/category', [CategoryController::class, 'index']);
-    Route::post('/category/create', [CategoryController::class, 'create']);
-    Route::get('/category/show/{id}', [CategoryController::class, 'show']);
-
+    Route::get('/Entertrainer/category', [EventController::class, 'SubCategory']);
+    Route::post('/Entertrainer/category/create', [EventController::class, 'SubCategoryCreate']);
     // //Entertrainer API Resources
     Route::get('/event', [EventController::class, "index"]);
     Route::post('/event/create', [EventController::class, "create"]);

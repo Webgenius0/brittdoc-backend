@@ -19,7 +19,8 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->decimal('price', 10, 2);
             $table->text('about');
-            $table->date('available_date');
+            $table->date('start_date');
+            $table->date('ending_date');
             $table->time('available_start_time');
             $table->time('available_end_time');
             $table->string('image')->nullable();
