@@ -10,6 +10,7 @@ use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\Entertrainer\BookingController;
 use App\Http\Controllers\API\Entertrainer\EventController;
+use App\Http\Controllers\API\RatingController;
 use App\Http\Controllers\API\User\HomeController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
 use App\Http\Controllers\API\V1\User\StripePaymentController;
@@ -63,7 +64,10 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //user section venue details
     Route::get('/user/venue/details/{id}', [VenueController::class, "VenueDetails"]);
     Route::post('/user/venue/booking', [BookingController::class, "BookingVenue"]);
-    
+    //user Rating
+    Route::get('/user/rating/list', [RatingController::class, "index"]);
+    Route::post('/user/venue/rating', [RatingController::class, "VenueRating"]);
+    Route::get('/user/indivisual/rating/{id}', [RatingController::class, "indivisualvenue"]);
 });
 
 //only for entertrainer
