@@ -10,6 +10,7 @@ use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\Entertrainer\BookingController;
 use App\Http\Controllers\API\Entertrainer\EventController;
+use App\Http\Controllers\API\User\HomeController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
 use App\Http\Controllers\API\V1\User\StripePaymentController;
 use App\Http\Controllers\API\V1\User\UserContactSupportController;
@@ -52,6 +53,13 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //Event
     Route::get('/event/user', [EventController::class, "index"]);
     Route::get('/event/booking/list/user', [BookingController::class, "index"]);
+
+    //homepage Api show 
+    Route::get('homePage/event/show', [HomeController::class, "index"]);
+    Route::get('homePage/entertainer/show', [HomeController::class, "entertainer"]);
+    Route::get('homePage/venue/show', [HomeController::class, "venue"]);
+    //venue details show 
+    Route::get('homePage/venue/details', [HomeController::class, "venueDetails"]);
 });
 
 //only for entertrainer

@@ -18,6 +18,27 @@ class Venue extends Model
         'available_end_time' => 'datetime:H:i'
     ];
 
+    public function getImageAttribute($value): array|null
+    {
+        $images = json_decode($value, true);
+
+        if (!is_array($images)) {
+            return null;
+        }
+
+        return array_map(function ($image) {
+            if (filter_var($image, FILTER_VALIDATE_URL)) {
+                return $image;
+            }
+
+            if (request()->is('api/*') && !empty($image)) {
+                return url($image); // Return full URL for API
+            }
+
+            return $image; // Return path for web
+        }, $images);
+    }
+
 
     public function user()
     {

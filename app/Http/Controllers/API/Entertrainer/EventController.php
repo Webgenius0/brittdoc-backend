@@ -62,6 +62,9 @@ class EventController extends Controller
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i',
                 'image' => 'nullable|image|max:2048',
+                'latitude' => 'required',
+                'longitude' => 'required',
+
             ]);
 
             // Create a new event input
@@ -88,6 +91,8 @@ class EventController extends Controller
                 'available_date' => $request->input('available_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
                 'image' => $image,
             ]);
 
@@ -125,7 +130,7 @@ class EventController extends Controller
             if (!$event) {
                 return Helper::jsonResponse(false, 'Event ID  not found.', 404);
             }
-           return response()->json([
+            return response()->json([
                 'success' => true,
                 'message' => 'Event retrieved Details successfully',
                 'data' => $event,
@@ -133,7 +138,7 @@ class EventController extends Controller
         } catch (Exception $e) {
             // Log::error("EventController::show" . $e->getMessage());
             // return Helper::jsonErrorResponse('Failed to retrieve Event', 500);
-             return response()->json([
+            return response()->json([
                 'error' => false,
                 'message' => 'Event not found',
                 $e->getMessage()
@@ -194,6 +199,8 @@ class EventController extends Controller
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i',
                 'image' => 'nullable|image|max:2048',
+                'latitude' => 'required',
+                'longitude' => 'required',
             ]);
 
             // check if the category is valid for venue holders
@@ -223,6 +230,8 @@ class EventController extends Controller
                 'available_date' => $request->input('available_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
                 'image' => $image,
             ]);
 

@@ -60,7 +60,10 @@ class VenueController extends Controller
                 'available_date' => 'required|date',
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i',
-                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048'
+                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048',
+                'latitude' => 'required',
+                'longitude' => 'required',
+
             ]);
 
             // check if the category is valid for venue holders
@@ -92,6 +95,8 @@ class VenueController extends Controller
                 'available_date' => $request->input('available_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
                 'image' => $uploadedImages, // JSON format for multiple images
             ]);
 
@@ -169,7 +174,9 @@ class VenueController extends Controller
                 'available_date' => 'required|date',
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i',
-                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048'
+                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048',
+                'latitude' => 'required',
+                'longitude' => 'required',
             ]);
 
             // check if the category is valid for venue holders
@@ -211,11 +218,14 @@ class VenueController extends Controller
                 'available_date' => $request->input('available_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
                 'image' => $uploadedImages, // JSON format for multiple images
+
             ]);
             return Helper::jsonResponse(true, 'Venue updated successfully.', 200, $venue);
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse('Failed to update Venue', 500);
+            return Helper::jsonErrorResponse('Failed to update Venue'. $e->getMessage(), 500 );
             Log::error("VenueController::update" . $e->getMessage());
         }
     }
