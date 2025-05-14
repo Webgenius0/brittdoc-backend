@@ -19,18 +19,16 @@ return new class extends Migration
             $table->string('category')->nullable();
             $table->string('location')->nullable();
             $table->string('name')->nullable();
-            $table->string('image')->nullable();
             $table->date('booking_date')->nullable();
             $table->time('booking_start_time')->nullable();
             $table->time('booking_end_time')->nullable();
-            $table->time('remaining_time')->nullable();
             //price
             $table->decimal('platform_rate', 10, 2)->nullable();
             $table->decimal('fee_percentage', 5, 2)->nullable();
             $table->decimal('fee_amount', 10, 2)->nullable();
             $table->decimal('net_amount', 10, 2)->nullable();
             $table->string('info')->default('Paid 24h ofter event completion');
-            $table->enum('status', ['pending', 'upcoming', 'in-progress', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'booked', 'upcoming', 'in-progress', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 
 class VenueController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -58,14 +59,14 @@ class VenueController extends Controller
                 'description' => 'required|string|max:1000',
                 'location' => 'required|string|max:255',
                 'capacity' => 'required|integer|min:1',
-                'price' => 'required|numeric|min:0',
+                'price' => 'required|numeric|min:1',
                 'start_date' => 'required|date',
                 'ending_date' => 'required|date|after_or_equal:start_date',
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i|after:available_start_time',
                 'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048',
-                'latitude' => 'required',
-                'longitude' => 'required',
+                'latitude' => 'nullable',
+                'longitude' => 'nullable',
 
             ]);
 
@@ -112,14 +113,6 @@ class VenueController extends Controller
                 "message" => $e->getMessage()
             ]);
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -181,9 +174,9 @@ class VenueController extends Controller
                 'available_date' => 'required|date',
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i',
-                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048',
-                'latitude' => 'required',
-                'longitude' => 'required',
+                'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4048',
+                'latitude' => 'nullable',
+                'longitude' => 'nullable',
             ]);
 
             // check if the category is valid for venue holders
@@ -236,7 +229,6 @@ class VenueController extends Controller
             Log::error("VenueController::update" . $e->getMessage());
         }
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -312,7 +304,6 @@ class VenueController extends Controller
     }
 
 
-
     //Venue Details user Section 
     public function VenueDetails($id)
     {
@@ -334,12 +325,25 @@ class VenueController extends Controller
             //platform rate
             $platform_rate = $hours * $venue->price;
 
+            //starting date to ending_date Array to Pass output
+            $dateRange = [];
+            if ($venue->start_date && $venue->ending_date) {
+                $startDate = Carbon::parse($venue->start_date);
+                $endDate = Carbon::parse($venue->ending_date);
+
+                while ($startDate->lte($endDate)) {
+                    $dateRange[] = $startDate->toDateString();
+                    $startDate->addDay();
+                }
+            }
+
             return response()->json([
                 "success" => true,
                 "message" => "Venue details retrieved successfully",
                 "booking" => $booking,
                 "platform_rate" => $platform_rate,
                 "venue" => $venue,
+                "Date_range" => $dateRange
             ], 200);
         } catch (Exception $e) {
             return response()->json([
@@ -349,4 +353,5 @@ class VenueController extends Controller
             ], 500);
         }
     }
+
 }

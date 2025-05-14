@@ -63,8 +63,8 @@ class EventController extends Controller
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i|after:available_start_time',
                 'image' => 'nullable|image|max:2048',
-                'latitude' => 'required',
-                'longitude' => 'required',
+                'latitude' => 'nullable',
+                'longitude' => 'nullable',
             ]);
 
             // Create a new event input
@@ -201,8 +201,8 @@ class EventController extends Controller
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i|after:available_start_time',
                 'image' => 'nullable|image|max:2048',
-                'latitude' => 'required',
-                'longitude' => 'required',
+                'latitude' => 'nullable',
+                'longitude' => 'nullable',
             ]);
 
             // check if the category is valid for venue holders

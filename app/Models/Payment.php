@@ -63,4 +63,5 @@ class Payment extends Model
     {
         return $this->status === 'success';
     }
+    
 }
