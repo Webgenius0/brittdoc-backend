@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Venue;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Rating;
 use App\Models\User;
 use App\Models\Venue;
 use Carbon\Carbon;
@@ -165,6 +166,7 @@ class VenueBookingController extends Controller
             }, 'user:id,name,avatar'])
                 ->where('status', 'completed')
                 ->where('id', $id)
+                ->with('rating')
                 ->first();
 
             if (!$completed) {
@@ -179,86 +181,91 @@ class VenueBookingController extends Controller
         }
     }
 
+
+
+    //apply time helper function 
     private function applyTimeStatus($booking)
     {
         $now = Carbon::now();
-        $start = Carbon::parse($booking->booking_date . $booking->booking_start_time);
-        $end = Carbon::parse($booking->booking_date . $booking->booking_end_time);
-        // dd($start .' '. $end);
+        $start = Carbon::parse($booking->booking_date . ' ' . date('H:i:s', strtotime($booking->booking_start_time)));
+        $end = Carbon::parse($booking->booking_date . ' ' . date('H:i:s', strtotime($booking->booking_end_time)));
+
         $booking->is_critical = false;
         $booking->is_expired = false;
         $booking->is_running = false;
 
         if ($now->lt($start)) {
-            // Before start time
             $diffInMinutes = $now->diffInMinutes($start);
-            $diffInDays = floor($diffInMinutes / (60 * 24));
-            $hours = floor(($diffInMinutes % (60 * 24)) / 60);
-            $minutes = $diffInMinutes % 60;
+            $formattedTime = Carbon::createFromTime(0, 0, 0)->addMinutes($diffInMinutes)->format('D H:i:s');
 
             if ($diffInMinutes <= 10) {
                 $booking->is_critical = true;
             }
 
-            $status = '';
-            if ($diffInDays > 0) {
-                $status .= "{$diffInDays} Day(s) ";
-            }
-            if ($hours > 0) {
-                $status .= "{$hours} Hour(s) ";
-            }
-            $status .= "{$minutes} Minute(s) Left To Start";
-
-            $booking->booking_status = $status;
+            $booking->booking_status = "{$formattedTime} Left To Start";
         } elseif ($now->between($start, $end)) {
-            // Running
             $diffInMinutes = $now->diffInMinutes($end);
-            $diffInDays = floor($diffInMinutes / (60 * 24));
-            $hours = floor(($diffInMinutes % (60 * 24)) / 60);
-            $minutes = $diffInMinutes % 60;
+
+            $formattedTime = Carbon::createFromTime(0, 0, 0)->addMinutes($diffInMinutes)->format('D H:i:s');
 
             $booking->is_running = true;
 
             if ($diffInMinutes <= 10) {
                 $booking->is_critical = true;
             }
-
-            $status = '';
-            if ($diffInDays > 0) {
-                $status .= "{$diffInDays} Day(s) ";
-            }
-            if ($hours > 0) {
-                $status .= "{$hours} Hour(s) ";
-            }
-            $status .= "{$minutes} Minute(s) Left To End";
-
-            $booking->booking_status = $status;
+            $booking->booking_status = "{$formattedTime} Left To End";
         } else {
-            // After end time
             $booking->is_expired = true;
-            $booking->booking_status = "Time Ended and Complted";
+            $booking->booking_status = "Time Ended and Completed";
         }
 
         return $booking;
     }
-    
-   
+
+
+
+    //all booked venue show  & search for upcoming and in-process  
+    public function InprogressUpcomming(Request $request)
+    {
+        $status = $request->query('status');
+        $now = Carbon::now();
+
+        $bookings = Booking::with(['venue' => function ($q) {
+            $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')
+                ->with('category:id,name');
+        }, 'user:id,name,avatar', 'rating'])
+            ->where('status', 'booked')
+            ->get();
+
+        //  status query 
+        if (!$status) {
+            $bookings->each(function ($booking) {
+                $this->applyTimeStatus($booking);
+            });
+
+            return Helper::jsonResponse(true, 'All Booked Data Returned', 200, $bookings);
+        }
+        //status 
+        $filtered = $bookings->filter(function ($booking) use ($status, $now) {
+            $this->applyTimeStatus($booking);
+
+            if (!$booking->venue) return false;
+
+            $venueStart = Carbon::parse($booking->venue->start_date);
+            $venueEnd = Carbon::parse($booking->venue->ending_date);
+            $createdAt = Carbon::parse($booking->created_at);
+
+            if ($status === 'upcoming') {
+                return $createdAt->lessThan($venueStart);
+            } elseif ($status === 'inprogress') {
+                return $now->between($venueStart, $venueEnd);
+            }
+
+            return false;
+        })->values();
+
+        return Helper::jsonResponse(true, 'Filtered Data Successful', 200, $filtered);
+    }
+
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -175,14 +175,11 @@ class EventController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+//update
     public function update(Request $request, string $id)
     {
-        // dd($request->all());
         try {
-            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
+            $event = Event::where('id', $id)->where('user_id', Auth::user()->id)->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -200,12 +197,11 @@ class EventController extends Controller
                 'ending_date' => 'required|date|after_or_equal:start_date',
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i|after:available_start_time',
-                'image' => 'nullable|image|max:2048',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'latitude' => 'nullable',
                 'longitude' => 'nullable',
             ]);
-
-            // check if the category is valid for venue holders
+            //category type check
             $category = Category::where('id', $request->category_id)
                 ->where('type', 'entertainer')
                 ->first();
@@ -214,13 +210,12 @@ class EventController extends Controller
                 return Helper::jsonResponse(false, 'Selected category is not valid for entertainer', 422);
             }
 
+            $image = $event->image;
             if ($request->hasFile('image')) {
-                // Delete old image
                 if ($event->image) {
                     Helper::fileDelete($event->image);
                 }
-                // Upload new image
-                $image = Helper::fileUpload($request->file('image'), 'Event', time() . '_' . getFileName($request->file('image')));
+                $image = Helper::fileUpload($request->file('image'), 'Event', time() . '_' . $request->file('image')->getClientOriginalName());
             }
 
             $event->update([
@@ -235,7 +230,7 @@ class EventController extends Controller
                 'available_end_time' => $request->input('available_end_time'),
                 'latitude' => $request->input('latitude'),
                 'longitude' => $request->input('longitude'),
-                'image' => $image,
+                'image' => $image, // Now $image is always defined
             ]);
 
             return response()->json([
@@ -247,8 +242,8 @@ class EventController extends Controller
             return response()->json([
                 'success' => false,
                 "message" => "Event not updated",
-                "message" => $e->getMessage()
-            ]);
+                "error" => $e->getMessage()
+            ], 500);
         }
     }
 
