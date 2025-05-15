@@ -152,9 +152,7 @@ class VenueController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    //venue update function 
     public function update(Request $request, string $id)
     {
         // dd($request->all());
@@ -190,14 +188,16 @@ class VenueController extends Controller
 
             $uploadedImages = [];
             if ($request->hasFile('image')) {
-                // Delete old images once
                 $oldImages = is_array($venue->image) ? $venue->image : json_decode($venue->image ?? '', true);
+
                 if (!empty($oldImages)) {
                     foreach ($oldImages as $oldImage) {
-                        Helper::fileDelete($oldImage);
+                        $parsedUrl = parse_url($oldImage, PHP_URL_PATH);
+                        $oldImagePath = ltrim($parsedUrl, '/');
+                        Helper::fileDelete($oldImagePath);
                     }
                 }
-                // Upload new images
+
                 foreach ($request->file('image') as $image) {
                     $uploadedImages[] = Helper::fileUpload(
                         $image,
@@ -206,6 +206,7 @@ class VenueController extends Controller
                     );
                 }
             }
+
 
             $venue->update([
                 'user_id' => Auth::user()->id,
@@ -244,7 +245,9 @@ class VenueController extends Controller
             $oldImages = is_array($venue->image) ? $venue->image : json_decode($venue->image ?? '', true);
             if (!empty($oldImages)) {
                 foreach ($oldImages as $oldImage) {
-                    Helper::fileDelete($oldImage);
+                    $parsedUrl = parse_url($oldImage, PHP_URL_PATH);
+                    $oldImagePath = ltrim($parsedUrl, '/');
+                    Helper::fileDelete($oldImagePath);
                 }
             }
 
@@ -353,5 +356,4 @@ class VenueController extends Controller
             ], 500);
         }
     }
-
 }

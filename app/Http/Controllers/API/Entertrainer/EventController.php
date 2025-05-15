@@ -111,16 +111,6 @@ class EventController extends Controller
         }
     }
 
-
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //store
-    }
-
     /**
      * Display the specified resource.
      */
@@ -175,7 +165,7 @@ class EventController extends Controller
         }
     }
 
-//update
+    //update
     public function update(Request $request, string $id)
     {
         try {
@@ -213,7 +203,9 @@ class EventController extends Controller
             $image = $event->image;
             if ($request->hasFile('image')) {
                 if ($event->image) {
-                    Helper::fileDelete($event->image);
+                    $parsedUrl = parse_url($event->image, PHP_URL_PATH);
+                    $oldImagePath = ltrim($parsedUrl, '/');
+                    Helper::fileDelete($oldImagePath);
                 }
                 $image = Helper::fileUpload($request->file('image'), 'Event', time() . '_' . $request->file('image')->getClientOriginalName());
             }
@@ -262,7 +254,9 @@ class EventController extends Controller
             }
 
             if ($event->image) {
-                Helper::fileDelete($event->image);
+                $parsedUrl = parse_url($event->image, PHP_URL_PATH);
+                $oldImagePath = ltrim($parsedUrl, '/');
+                Helper::fileDelete($oldImagePath);
             }
 
             $event->delete();
