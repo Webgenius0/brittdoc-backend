@@ -10,11 +10,15 @@ use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\Entertrainer\BookingController;
 use App\Http\Controllers\API\Entertrainer\EventController;
+use App\Http\Controllers\API\Payment\PaymentController;
+use App\Http\Controllers\API\RatingController;
 use App\Http\Controllers\API\User\HomeController;
+use App\Http\Controllers\API\User\UserBookingController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
 use App\Http\Controllers\API\V1\User\StripePaymentController;
 use App\Http\Controllers\API\V1\User\UserContactSupportController;
 use App\Http\Controllers\API\V1\User\UserFaqController;
+use App\Http\Controllers\API\Venue\VenueBookingController;
 use App\Http\Controllers\API\Venue\VenueController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +64,22 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('homePage/venue/show', [HomeController::class, "venue"]);
     //venue details show 
     Route::get('/homePage/venue/details/{id}', [HomeController::class, "venueDetails"]);
+    //user section venue details
+    Route::get('/user/venue/details/{id}', [VenueController::class, "VenueDetails"]);
+    Route::post('/user/venue/booking/{id}', [VenueBookingController::class, "BookingVenue"]);
+    Route::get('/venues/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming"]);
+
+    //user Rating
+    Route::get('/user/rating/list', [RatingController::class, "index"]);
+    Route::post('/user/venue/rating', [RatingController::class, "VenueRating"]);
+    Route::get('/user/indivisual/rating/{id}', [RatingController::class, "indivisualvenue"]);
+    //after pay screen 
+
+    //payment 
+    Route::post('/payments/{id}', [PaymentController::class, 'store']);
+    Route::get('/payments/{id}', [PaymentController::class, 'AfterPayScreen']);
+    //
+
 });
 
 //only for entertrainer
@@ -80,15 +100,11 @@ Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($
     Route::post('/event/booking/create', [BookingController::class, "create"]);
 });
 
-
-
 //only for venue holder
 Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function ($router) {
-    //
     //Category API
-    Route::get('/category', [CategoryController::class, 'index']);
-    Route::post('/category/create', [CategoryController::class, 'create']);
-    Route::get('/category/show/{id}', [CategoryController::class, 'show']);
+    Route::get('/venue_holder/category', [VenueController::class, 'SubCategory']);
+    Route::post('/venue_holder/category/create', [VenueController::class, 'SubCategoryCreate']);
     //venue API
     Route::get('/venue', [VenueController::class, "index"]);
     Route::post('/venue/create', [VenueController::class, "create"]);
@@ -96,6 +112,13 @@ Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function (
     Route::get('/venue/edit/{id}', [VenueController::class, "edit"]);
     Route::post('/venue/update/{id}', [VenueController::class, "update"]);
     Route::delete('/venue/delete/{id}', [VenueController::class, "destroy"]);
+    //venue booking Details
+    Route::get('/venue/homePage', [VenueBookingController::class, "CountTotal"]);
+    Route::get('/all/booking/complated', [VenueBookingController::class, "bookingList"]);
+    //booking details
+    Route::get('/booking/venue/details/{id}', [VenueBookingController::class, "VenueBookingDetials"]);
+    Route::get('/completed/venue/details/{id}', [VenueBookingController::class, "venueCompletedDetails"]);
+    Route::get('/venue/inprogress/upcomming', [UserBookingController::class, "InprogressUpcomming"]);
 });
 
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Event;
 use App\Models\User;
+use App\Models\Venue;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -47,7 +48,7 @@ class BookingController extends Controller
         }
     }
 
-
+    //testing  booking create 
     public function create(Request $request)
     {
         try {
@@ -106,43 +107,76 @@ class BookingController extends Controller
     }
 
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    //Venue User   Booking Create  
+    // public function BookingVenue(Request $request, $id)
+    // {
+    //     try {
+    //         $validator = Validator::make($request->all(), [
+    //             'booking_date' => 'required|date|after_or_equal:today',
+    //         ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    //         $venue = Venue::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    //         if (!$venue) {
+    //             return response()->json(['message' => 'Venue Id Not found.'], 404);
+    //         }
+    //         //booking date check vaildate
+    //         $startDate = Carbon::parse($venue->start_date)->toDateString();
+    //         $endDate = Carbon::parse($venue->ending_date)->toDateString();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    //         $validator->after(function ($validator) use ($request, $startDate, $endDate) {
+    //             $bookingDate = Carbon::parse($request->booking_date)->toDateString();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    //             if (!($bookingDate >= $startDate && $bookingDate <= $endDate)) {
+    //                 $validator->errors()->add(
+    //                     'booking_date',
+    //                     "Booking date must be between $startDate and $endDate."
+    //                 );
+    //             }
+    //         });
+
+    //         if ($validator->fails()) {
+    //             return Helper::jsonResponse(false, 'Booking Date not Available.', 422, $validator->errors());
+    //         }
+
+    //         $start = Carbon::parse($venue->available_start_time);
+    //         $end = Carbon::parse($venue->available_end_time);
+
+    //         if ($end->lt($start)) {
+    //             [$start, $end] = [$end, $start];
+    //         }
+    //         $diffInMinutes = $start->diffInMinutes($end);
+    //         $hours = (int) ceil($diffInMinutes / 60);
+    //         // dd($hours);
+
+    //         $platform_rate = $hours * 100;    // $100 per hours
+    //         $fee_percentage = 17;
+    //         $fee_amount = ($platform_rate * $fee_percentage) / 100;
+    //         $net_amount = $platform_rate - $fee_amount;
+    //         // dd($net_amount);
+
+    //         //user
+    //         $user = User::find(Auth::user()->id);
+    //         $booking = Booking::create([
+    //             'user_id' => Auth::user()->id,
+    //             'venue_id' => $venue->id,
+    //             'category' => $venue->category_id,        //venue table ar category_id
+    //             'location' => $venue->location,         //event table ar location
+    //             'name' => $user->name,                  //user table ar name
+    //             'image' => $user->image,                 //user table ar image
+    //             'booking_date' => $request->booking_date,
+    //             'booking_start_time' => $venue->available_start_time,
+    //             'booking_end_time' => $venue->available_end_time,
+    //             'platform_rate' => $platform_rate,
+    //             'fee_percentage' => $fee_percentage,
+    //             'fee_amount' => $fee_amount,
+    //             'net_amount' => $net_amount,
+    //             'status' => 'pending'
+    //         ]);
+    //         // dd($booking);
+    //         return Helper::jsonResponse(true, 'Venue Booking created successfully.', 200, $booking);
+    //     } catch (Exception $e) {
+    //         return Helper::jsonResponse(false, ' Venue Booking creation failed.', 500, $e->getMessage());
+    //     }
+    // }
 }

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API\Venue;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Venue;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 
 class VenueController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -56,13 +59,14 @@ class VenueController extends Controller
                 'description' => 'required|string|max:1000',
                 'location' => 'required|string|max:255',
                 'capacity' => 'required|integer|min:1',
-                'price' => 'required|numeric|min:0',
-                'available_date' => 'required|date',
+                'price' => 'required|numeric|min:1',
+                'start_date' => 'required|date',
+                'ending_date' => 'required|date|after_or_equal:start_date',
                 'available_start_time' => 'required|date_format:H:i',
-                'available_end_time' => 'required|date_format:H:i',
+                'available_end_time' => 'required|date_format:H:i|after:available_start_time',
                 'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048',
-                'latitude' => 'required',
-                'longitude' => 'required',
+                'latitude' => 'nullable',
+                'longitude' => 'nullable',
 
             ]);
 
@@ -92,7 +96,8 @@ class VenueController extends Controller
                 'capacity' => $request->input('capacity'),
                 'price' => $request->input('price'),
                 'description' => $request->input('description'),
-                'available_date' => $request->input('available_date'),
+                'start_date' => $request->input('start_date'),
+                'ending_date' => $request->input('ending_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
                 'latitude' => $request->input('latitude'),
@@ -102,17 +107,12 @@ class VenueController extends Controller
 
             return Helper::jsonResponse(true, 'Venue created successfully.', 201, $data);
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse('Failed to create Venue', 500);
-            Log::error("VenueController::create" . $e->getMessage());
+            return response()->json([
+                "success" => false,
+                "message" => "Category not create",
+                "message" => $e->getMessage()
+            ]);
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -165,18 +165,18 @@ class VenueController extends Controller
             }
 
             $request->validate([
-                'name' => 'required|string|max:255|unique:venues,name,' . $id,
-                'category_id' => 'required|exists:categories,id',
-                'description' => 'required|string|max:1000',
-                'location' => 'required|string|max:255',
-                'capacity' => 'required|integer|min:1',
-                'price' => 'required|numeric|min:0',
-                'available_date' => 'required|date',
-                'available_start_time' => 'required|date_format:H:i',
-                'available_end_time' => 'required|date_format:H:i',
-                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048',
-                'latitude' => 'required',
-                'longitude' => 'required',
+                'name' => 'nullable|string|max:255|unique:venues,name,' . $id,
+                'category_id' => 'nullable|exists:categories,id',
+                'description' => 'nullable|string|max:1000',
+                'location' => 'nullable|string|max:255',
+                'capacity' => 'nullable|integer|min:1',
+                'price' => 'nullable|numeric|min:0',
+                'available_date' => 'nullable|date',
+                'available_start_time' => 'nullable|date_format:H:i',
+                'available_end_time' => 'nullable|date_format:H:i',
+                'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4048',
+                'latitude' => 'nullable',
+                'longitude' => 'nullable',
             ]);
 
             // check if the category is valid for venue holders
@@ -225,11 +225,10 @@ class VenueController extends Controller
             ]);
             return Helper::jsonResponse(true, 'Venue updated successfully.', 200, $venue);
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse('Failed to update Venue'. $e->getMessage(), 500 );
+            return Helper::jsonErrorResponse('Failed to update Venue' . $e->getMessage(), 500);
             Log::error("VenueController::update" . $e->getMessage());
         }
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -256,4 +255,103 @@ class VenueController extends Controller
             Log::error("VenueController::destroy" . $e->getMessage());
         }
     }
+
+    //sub category venue
+    public function SubCategory(Request $request)
+    {
+        try {
+            $category = Category::where('type', 'venue_holder')->get();
+            return response()->json([
+                "success" => true,
+                "message" => "Sub-category created successfully",
+                "category" => $category
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                "failed" => false,
+                $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // sub category create venue
+    public function SubCategoryCreate(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]);
+
+            $validatedData['type'] = 'venue_holder';
+
+            if ($request->hasFile('image')) {
+                $validatedData['image'] = Helper::fileUpload($request->file('image'), 'category', time() . '_' . getFileName($request->file('image')));
+            }
+            $category = Category::create($validatedData);
+
+            return response()->json([
+                "success" => true,
+                "message" => "Sub-category created successfully",
+                "category" => $category
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                "failed" => false,
+                $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    //Venue Details user Section 
+    public function VenueDetails($id)
+    {
+        try {
+            $booking = Booking::where('status', 'completed')->where('venue_id', $id)->count();
+            $venue = Venue::where('status', 'active')->find($id);
+            if (!$venue) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Venue not found or inactive"
+                ], 404);
+            }
+
+            // Calculate hours
+            $start = Carbon::parse($venue->available_start_time);
+            $end = Carbon::parse($venue->available_end_time);
+            $hours = (int)ceil(abs($start->floatDiffInHours($end)));
+
+            //platform rate
+            $platform_rate = $hours * $venue->price;
+
+            //starting date to ending_date Array to Pass output
+            $dateRange = [];
+            if ($venue->start_date && $venue->ending_date) {
+                $startDate = Carbon::parse($venue->start_date);
+                $endDate = Carbon::parse($venue->ending_date);
+
+                while ($startDate->lte($endDate)) {
+                    $dateRange[] = $startDate->toDateString();
+                    $startDate->addDay();
+                }
+            }
+
+            return response()->json([
+                "success" => true,
+                "message" => "Venue details retrieved successfully",
+                "booking" => $booking,
+                "platform_rate" => $platform_rate,
+                "venue" => $venue,
+                "Date_range" => $dateRange
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                "success" => false,
+                "message" => "Error retrieving venue details",
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

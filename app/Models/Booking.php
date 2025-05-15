@@ -18,4 +18,20 @@ class Booking extends Model
     {
         return $this->belongsTo(Event::class);
     }
+
+    public function venue()
+    {
+        return $this->belongsTo(Venue::class);
+    }
+
+    public function rating()
+    {
+        return $this->hasOne(Rating::class);
+    }
+
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
