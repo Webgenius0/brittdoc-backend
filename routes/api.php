@@ -9,6 +9,7 @@ use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\Entertrainer\BookingController;
+use App\Http\Controllers\API\Entertrainer\BookingDetailsController;
 use App\Http\Controllers\API\Entertrainer\EventController;
 use App\Http\Controllers\API\Payment\PaymentController;
 use App\Http\Controllers\API\RatingController;
@@ -67,18 +68,24 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //user section venue details
     Route::get('/user/venue/details/{id}', [VenueController::class, "VenueDetails"]);
     Route::post('/user/venue/booking/{id}', [VenueBookingController::class, "BookingVenue"]);
-    Route::get('/venues/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming"]);
+    Route::get('/venues/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming"]); 
 
     //user Rating
-    Route::get('/user/rating/list', [RatingController::class, "index"]);
-    Route::post('/user/venue/rating', [RatingController::class, "VenueRating"]);
+    Route::get('/user/rating/list', [RatingController::class, "index"]);                                   
+    Route::post('/user/venue/event/rating', [RatingController::class, "CreateRating"]);                   
     Route::get('/user/indivisual/rating/{id}', [RatingController::class, "indivisualvenue"]);
     //after pay screen 
 
     //payment 
-    Route::post('/payments/{id}', [PaymentController::class, 'store']);
+    Route::post('/payments/{id}', [PaymentController::class, 'store']);         //venue and user both payment     
     Route::get('/payments/{id}', [PaymentController::class, 'AfterPayScreen']);
-    //
+    Route::get('/Enertainer/payments/{id}', [PaymentController::class, 'AfterPayScreenEntertainer']);
+
+    //event show category wise
+    Route::get('/entertainer/show/category-wise', [EventController::class, "entertainer"]);                       
+    Route::get('/entertainer/category/details/{id}', [EventController::class, "entertainerCategoryDetails"]);     
+    Route::post('/user/Enterianer/booking/{id}', [BookingController::class, "BookingEntertainer"]);              
+    Route::get('/user/event/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming1"]); 
 
 });
 
@@ -94,6 +101,10 @@ Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($
     Route::get('/event/edit/{id}', [EventController::class, "edit"]);
     Route::post('/event/update/{id}', [EventController::class, "update"]);
     Route::delete('/event/delete/{id}', [EventController::class, "destroy"]);
+    //------------------
+    Route::get('/event/homePage', [BookingDetailsController::class, "CountTotal"]);
+    Route::get('/event/homePage', [BookingDetailsController::class, "CountTotal"]);
+
 
     //create booking
     Route::get('/event/booking', [BookingController::class, "index"]);
@@ -127,8 +138,6 @@ Route::post('/payments-create/stripe', [StripePaymentController::class, 'handleW
 
 // only for user and host
 Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venue_holder']], function ($router) {
-    Route::post('/updates-profile', [UserController::class, 'updateProfile']);
-
     //notification
     Route::get('/notification-settings', [UserController::class, 'getNotificationSettings']);
     Route::post('/notification-settings', [UserController::class, 'notificationSettings']);

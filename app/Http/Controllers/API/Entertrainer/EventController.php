@@ -4,8 +4,11 @@ namespace App\Http\Controllers\API\Entertrainer;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Venue;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +25,7 @@ class EventController extends Controller
             $search = $request->query('search', '');
             $per_page = $request->query('per_page', 100);
 
-            $query = Event::query();
+            $query = Event::with('category');
 
             if (!empty($search)) {
                 $query->where(function ($q) use ($search) {
@@ -37,7 +40,7 @@ class EventController extends Controller
                 return Helper::jsonResponse(false, 'No event found for the given search.', 404);
             }
 
-            return Helper::jsonResponse(true, 'Event retrieved successfully.', 200, $event, true);
+            return Helper::jsonResponse(true, 'All List Event retrieved successfully.', 200, $event, true);
         } catch (Exception $e) {
             Log::error("EventController::index" . $e->getMessage());
             return Helper::jsonErrorResponse('Failed to retrieve Event', 500);
@@ -280,12 +283,11 @@ class EventController extends Controller
             $category = Category::where('type', 'entertainer')->get();
             return response()->json([
                 "success" => true,
-                "message" => "Sub-category created successfully",
+                "message" => "Sub-category List successfully",
                 "category" => $category
             ], 201);
         } catch (Exception $e) {
             return response()->json([
-                "failed" => false,
                 $e->getMessage()
             ], 500);
         }
@@ -315,6 +317,108 @@ class EventController extends Controller
             return response()->json([
                 "failed" => false,
                 $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    //show entertainer category(2 items) wish and id pass show all category  
+    public function entertainer(Request $request)
+    {
+        try {
+            $searchName  = $request->search;
+            $categoryIds = $request->category_id;
+
+            if ($categoryIds) {
+                $categoryIds = is_array($categoryIds) ? $categoryIds : explode(',', $categoryIds);
+            }
+
+            $query = Event::query()->with(['user:id,name', 'category:id,name']);
+            if ($searchName) {
+                $query->whereHas('user', function ($q) use ($searchName) {
+                    $q->where('name', 'like', "%{$searchName}%");
+                });
+            }
+
+            if (!empty($categoryIds)) {
+                $query->whereIn('category_id', $categoryIds);
+            }
+
+            $events = $query->get()->makeHidden(['created_at', 'updated_at', 'status']);
+
+            if ($events->isEmpty()) {
+                return Helper::jsonResponse(true, 'No events found.', 200);
+            }
+            $groupedEvents = $events->groupBy(function ($item) {
+                return $item->category->name ?? ' Category';
+            });
+
+            return Helper::jsonResponse(true, 'Event data grouped by category.', 200, $groupedEvents);
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Failed to retrieve event data.', 403, [$e->getMessage()]);
+        }
+    }
+
+
+    //entertainer Category Details show
+    public function entertainerCategoryDetails($id)
+    {
+        try {
+            $Completed = Booking::where('status', 'completed')
+                ->where('event_id', $id)
+                ->count();
+
+            $event = Event::where('status', 'active')
+                ->with('rating')
+                ->find($id);
+
+            if (!$event) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "event not found or inactive"
+                ], 404);
+            }
+
+            $start = Carbon::parse($event->available_start_time);
+            $end = Carbon::parse($event->available_end_time);
+            $hours = (int)ceil(abs($start->floatDiffInHours($end)));
+
+            $platform_rate = $hours * $event->price;
+
+            $dateRange = [];
+            if ($event->start_date && $event->ending_date) {
+                $startDate = Carbon::parse($event->start_date);
+                $endDate = Carbon::parse($event->ending_date);
+
+                $bookedDates = Booking::where('event_id', $event->id)
+                    ->pluck('booking_date')
+                    ->map(fn($date) => Carbon::parse($date)->toDateString())
+                    ->toArray();
+
+                while ($startDate->lte($endDate)) {
+                    $currentDate = $startDate->toDateString();
+                    if ($currentDate >= Carbon::today()->toDateString() && !in_array($currentDate, $bookedDates)) {
+                        $dateRange[] = $currentDate;
+                    }
+
+                    $startDate->addDay();
+                }
+            }
+            $dateRange = !empty($dateRange) ? $dateRange : ['No Booking'];
+
+            return response()->json([
+                "success" => true,
+                "message" => "event details retrieved successfully",
+                "Completed" => $Completed,
+                "platform_rate" => $platform_rate,
+                "event" => $event,
+                "Date_range" => $dateRange
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                "success" => false,
+                "message" => "Error retrieving event details",
+                "error" => $e->getMessage()
             ], 500);
         }
     }
