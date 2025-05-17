@@ -121,7 +121,7 @@ class VenueController extends Controller
     public function show(string $id)
     {
         try {
-            $venue = Venue::where('id', $id)->with('user')->first();
+            $venue = Venue::where('id', $id)->with(['user:id,name,avatar', 'category:id,name,image'])->first();
             if (!$venue) {
                 return Helper::jsonResponse(false, 'Venue ID  not found.', 404);
             }
@@ -264,15 +264,21 @@ class VenueController extends Controller
     {
         try {
             $category = Category::where('type', 'venue_holder')->get();
-            return response()->json([
-                "success" => true,
-                "message" => "Sub-category created successfully",
-                "category" => $category
-            ], 201);
+            if ($category->isEmpty()) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Sub-category list not found",
+                    "category" => []
+                ]);
+            }
+
+            return Helper::jsonResponse(true, 'Sub-category list retrieved successfully.', 200, [
+                'category' => $category,
+            ]);
         } catch (Exception $e) {
             return response()->json([
-                "failed" => false,
-                $e->getMessage()
+                "success" => false,
+                "message" => $e->getMessage()
             ], 500);
         }
     }
@@ -307,47 +313,62 @@ class VenueController extends Controller
     }
 
 
+
+
     //Venue Details user Section 
     public function VenueDetails($id)
     {
         try {
-            $booking = Booking::where('status', 'completed')->where('venue_id', $id)->count();
-            $venue = Venue::where('status', 'active')->find($id);
+            $Completed = Booking::where('status', 'completed')
+                ->where('venue_id', $id)
+                ->count();
+
+            $venue =Venue::where('status', 'active')
+                ->with('rating')
+                ->find($id);
+
             if (!$venue) {
                 return response()->json([
                     "success" => false,
-                    "message" => "Venue not found or inactive"
+                    "message" => "venue not found or inactive"
                 ], 404);
             }
 
-            // Calculate hours
             $start = Carbon::parse($venue->available_start_time);
             $end = Carbon::parse($venue->available_end_time);
             $hours = (int)ceil(abs($start->floatDiffInHours($end)));
 
-            //platform rate
             $platform_rate = $hours * $venue->price;
 
-            //starting date to ending_date Array to Pass output
             $dateRange = [];
             if ($venue->start_date && $venue->ending_date) {
                 $startDate = Carbon::parse($venue->start_date);
                 $endDate = Carbon::parse($venue->ending_date);
 
+                $bookedDates = Booking::where('venue_id', $venue->id)
+                    ->pluck('booking_date')
+                    ->map(fn($date) => Carbon::parse($date)->toDateString())
+                    ->toArray();
+
                 while ($startDate->lte($endDate)) {
-                    $dateRange[] = $startDate->toDateString();
+                    $currentDate = $startDate->toDateString();
+                    if ($currentDate >= Carbon::today()->toDateString() && !in_array($currentDate, $bookedDates)) {
+                        $dateRange[] = $currentDate;
+                    }
+
                     $startDate->addDay();
                 }
             }
+            $dateRange = !empty($dateRange) ? $dateRange : ['No Booking'];
 
             return response()->json([
                 "success" => true,
-                "message" => "Venue details retrieved successfully",
-                "booking" => $booking,
+                "message" => "venue details retrieved successfully",
+                "Completed" => $Completed,
                 "platform_rate" => $platform_rate,
                 "venue" => $venue,
                 "Date_range" => $dateRange
-            ], 200);
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 "success" => false,

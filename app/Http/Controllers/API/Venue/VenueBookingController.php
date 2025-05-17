@@ -222,9 +222,7 @@ class VenueBookingController extends Controller
         return $booking;
     }
 
-
-
-    //all booked venue show  & search for upcoming and in-process  
+    // Venue  inprogress and upcomming  
     public function InprogressUpcomming(Request $request)
     {
         $status = $request->query('status');
@@ -265,11 +263,11 @@ class VenueBookingController extends Controller
             return false;
         })->values();
 
-        return Helper::jsonResponse(true, 'Filtered venue  Data Successful', 200, $filtered);
+        return Helper::jsonResponse(true, 'Filtered Data Successful', 200, $filtered);
     }
 
 
-    //all booked venue show  & search for upcoming and in-process  
+    //Event all booked show  & search for upcoming and in-process  
     public function InprogressUpcomming1(Request $request)
     {
         $status = $request->query('status');

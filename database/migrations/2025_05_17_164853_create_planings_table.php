@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('packages', function (Blueprint $table) {
-            $table->id();
+        Schema::create('planings', function (Blueprint $table) {
+           $table->id();
             $table->string('title');
             $table->string('image')->nullable();
             $table->longText('description')->nullable();
@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('billing_cycle', ['lifetime','monthly']);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
+
         });
     }
 
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('packages');
+        Schema::dropIfExists('planings');
     }
 };

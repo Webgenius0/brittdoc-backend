@@ -17,6 +17,12 @@ class Venue extends Model
         'available_start_time' => 'datetime:H:i',
         'available_end_time' => 'datetime:H:i'
     ];
+    public function rating()
+    {
+        return $this->hasOne(Rating::class);
+    }
+
+
 
     public function getImageAttribute($value): array|null
     {
@@ -38,7 +44,6 @@ class Venue extends Model
             return $image; // Return path for web
         }, $images);
     }
-
 
     public function user()
     {

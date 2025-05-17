@@ -54,8 +54,8 @@
                                 <div class="form-group position-relative">
                                     <input type="text"
                                         class="form-control text-dark ps-5 h-55 @error('name') is-invalid @enderror"
-                                        name="name" value="{{ old('name',$data->name) }}" placeholder="Enter section name here">
-
+                                        name="name" value="{{ old('name', $data->name ?? " ") }}"
+                                        placeholder="Enter section name here">
                                 </div>
                                 @error('name')
                                     <div id="name-error" class="text-danger">{{ $message }}</div>
@@ -68,14 +68,16 @@
                                 <label class="label text-secondary">Description</label>
                                 <div class="form-group position-relative">
                                     <textarea name="description" class="form-control @error('description') is-invalid @enderror" id="page_content"
-                                        placeholder="description here">{{ old('description',$data->description) }}</textarea>
+                                        placeholder="description here">{{ old('description', $data->description ?? " ") }}</textarea>
                                 </div>
                                 @error('description')
                                     <div id="description-error" class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
+
                     </div>
+
                     <div class="row mt-3">
                         <div class="col-lg-12">
                             <div class="d-flex flex-wrap gap-3">
@@ -96,7 +98,7 @@
     <script>
         ClassicEditor
             .create(document.querySelector('#page_content'), {
-                
+
             })
             .catch(error => {
                 console.error(error);

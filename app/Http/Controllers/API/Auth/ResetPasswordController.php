@@ -130,9 +130,31 @@ class ResetPasswordController extends Controller
             } else {
                 return Helper::jsonErrorResponse('Invalid Token', 419);
             }
-
         } catch (Exception $e) {
             Log::error('ResetPasswordController::ResetPassword' . $e->getMessage());
+            return Helper::jsonErrorResponse($e->getMessage(), 500);
+        }
+    }
+
+    
+    //user password change
+    public function PasswordUpdate(Request $request)
+    {
+        try {
+            $request->validate([
+                'old_password' => 'required',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            $user = Auth::user();
+            if (!Hash::check($request->old_password, $user->password)) {
+                return Helper::jsonErrorResponse("Old password does not match", 404);
+            }
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return Helper::jsonResponse(true, 'Password successfully updated', 200);
+        } catch (Exception $e) {
             return Helper::jsonErrorResponse($e->getMessage(), 500);
         }
     }
