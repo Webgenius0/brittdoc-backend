@@ -16,6 +16,10 @@ class Rating extends Model
     {
         return $this->belongsTo(Booking::class);
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     protected $casts = [
         'updated_at' => 'datetime:Y-m-d H:i:s',

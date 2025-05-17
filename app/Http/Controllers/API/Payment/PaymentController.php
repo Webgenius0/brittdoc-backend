@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\API\Payment;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Event;
 use App\Models\Payment;
 use App\Models\Rating;
 use App\Models\Venue;
@@ -89,6 +91,38 @@ class PaymentController extends Controller
                 "message" => "Error retrieving details",
                 "error" => $e->getMessage()
             ], 500);
+        }
+    }
+
+
+    //uesr section After Pay Screen Entertainer
+    public function AfterPayScreenEntertainer($id)
+    {
+        try {
+            $booking = Booking::with(['rating', 'user:id,name,avatar', 'event:id,category_id', 'event.category:id,name',])
+                ->select('id', 'name', 'booking_date', 'booking_start_time', 'booking_end_time', 'event_id', 'user_id')
+                ->find($id);
+
+            $event = Event::where('status', 'active')->find($id);
+            if (!$event) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "event not found or inactive"
+                ]);
+            }
+            // Calculate platform rate
+            $start = Carbon::parse($event->available_start_time);
+            $end = Carbon::parse($event->available_end_time);
+            $hours = (int) ceil($start->floatDiffInHours($end));
+            $platform_rate = $hours * $event->price;
+
+
+            return Helper::jsonResponse(true, 'Payment successfully.', 200, [
+                'platform_rate' => $platform_rate,
+                'booking' => $booking,
+            ]);
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('something went wrong', 500, [$e->getMessage()]);
         }
     }
 }

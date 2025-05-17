@@ -8,7 +8,7 @@ class Event extends Model
 {
     protected $guarded = [];
 
-
+    
     public function getImageAttribute($value): string|null
     {
         if (filter_var($value, FILTER_VALIDATE_URL)) {
@@ -37,5 +37,9 @@ class Event extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+    public function rating()
+    {
+        return $this->hasOne(Rating::class);
     }
 }

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API\User;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Event;
+use App\Models\User;
 use App\Models\Venue;
 use Exception;
 use Illuminate\Http\Request;
@@ -35,12 +37,12 @@ class HomeController extends Controller
     public function entertainer(Request $request)
     {
         try {
-            $events = Event::with(['user:id,name,avatar', 'category:id,name'])->select('id', 'price', 'category_id', 'user_id')->get();
+            $Entertainer = Event::with(['user:id,name,avatar', 'category:id,name'])->select('id', 'price', 'category_id', 'user_id')->get();
 
             return response()->json([
                 'success' => true,
                 'message' => 'entertainer show successfully',
-                'events' => $events,
+                'Entertainer' => $Entertainer,
             ]);
         } catch (Exception $e) {
             return response()->json([

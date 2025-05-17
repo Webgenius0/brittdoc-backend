@@ -222,9 +222,7 @@ class VenueBookingController extends Controller
         return $booking;
     }
 
-
-
-    //all booked venue show  & search for upcoming and in-process  
+    // Venue  inprogress and upcomming  
     public function InprogressUpcomming(Request $request)
     {
         $status = $request->query('status');
@@ -235,6 +233,7 @@ class VenueBookingController extends Controller
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
             ->where('status', 'booked')
+            ->where('user_id', Auth::user()->id)
             ->get();
 
         //  status query 
@@ -268,4 +267,47 @@ class VenueBookingController extends Controller
     }
 
 
+    //Event all booked show  & search for upcoming and in-process  
+    public function InprogressUpcomming1(Request $request)
+    {
+        $status = $request->query('status');
+        $now = Carbon::now();
+
+        $bookings = Booking::with(['event' => function ($q) {
+            $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')
+                ->with('category:id,name');
+        }, 'user:id,name,avatar', 'rating'])
+            ->where('status', 'booked')
+            ->where('user_id', Auth::user()->id)
+            ->get();
+
+        //  status query 
+        if (!$status) {
+            $bookings->each(function ($booking) {
+                $this->applyTimeStatus($booking);
+            });
+
+            return Helper::jsonResponse(true, 'All Booked Data Returned', 200, $bookings);
+        }
+        //status 
+        $filtered = $bookings->filter(function ($booking) use ($status, $now) {
+            $this->applyTimeStatus($booking);
+
+            if (!$booking->event) return false;
+
+            $eventStart = Carbon::parse($booking->event->start_date);
+            $eventEnd = Carbon::parse($booking->event->ending_date);
+            $createdAt = Carbon::parse($booking->created_at);
+
+            if ($status === 'upcoming') {
+                return $createdAt->lessThan($eventStart);
+            } elseif ($status === 'inprogress') {
+                return $now->between($eventStart, $eventEnd);
+            }
+
+            return false;
+        })->values();
+
+        return Helper::jsonResponse(true, 'Filtered Data Successful', 200, $filtered);
+    }
 }
