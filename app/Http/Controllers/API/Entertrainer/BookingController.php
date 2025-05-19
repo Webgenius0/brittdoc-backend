@@ -90,4 +90,23 @@ class BookingController extends Controller
             return Helper::jsonResponse(false, ' event Booking creation failed.', 500, $e->getMessage());
         }
     }
+
+    public function statusUpdate(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'status' => 'required|in:booked,completed',
+        ]);
+
+        $booking = Booking::find($request->booking_id);
+
+        // Update the status
+        $booking->status = $request->status;
+        $booking->save();
+
+        return response()->json([
+            'message' => 'Booking status updated successfully.',
+            'booking' => $booking,
+        ]);
+    }
 }

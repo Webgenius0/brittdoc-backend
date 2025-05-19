@@ -95,6 +95,9 @@ $systemSetting = App\Models\SystemSetting::first();
             <li class="menu-title small text-uppercase">
                 <span class="menu-title-text">OTHERS</span>
             </li>
+            <li class="menu-title small text-uppercase">
+                <span class="menu-title-text">Subcription</span>
+            </li>
 
             <!-- Settings Menu Item -->
             <li class="menu-item {{ request()->routeIs('profile_settings.*', 'system_settings.*') ? 'open' : '' }}">

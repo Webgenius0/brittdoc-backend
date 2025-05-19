@@ -70,6 +70,7 @@ class VenueController extends Controller
 
             ]);
 
+            // dd($data);
             // check if the category is valid for venue holders
             $category = Category::where('id', $request->category_id)
                 ->where('type', 'venue_holder')
@@ -323,7 +324,7 @@ class VenueController extends Controller
                 ->where('venue_id', $id)
                 ->count();
 
-            $venue =Venue::where('status', 'active')
+            $venue = Venue::where('status', 'active')
                 ->with('rating')
                 ->find($id);
 

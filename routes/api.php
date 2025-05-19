@@ -160,4 +160,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     //common api endpoint 
     Route::post('/change-password', [ResetPasswordController::class, 'PasswordUpdate']);
     Route::get('/privacy-policy', [HomePageController::class, 'privacyList']);
+
+    Route::get('/booking/status-update', [BookingController::class, 'statusUpdate']);
+
 });
