@@ -91,22 +91,26 @@ class BookingController extends Controller
         }
     }
 
-    public function statusUpdate(Request $request)
+    public function status(Request $request)
     {
-        $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'status' => 'required|in:booked,completed',
-        ]);
+        try {
+            $request->validate([
+                'booking_id' => 'required|exists:bookings,id',
+                'status' => 'required|in:booked,completed',
+            ]);
 
-        $booking = Booking::find($request->booking_id);
+            $booking = Booking::find($request->booking_id);
 
-        // Update the status
-        $booking->status = $request->status;
-        $booking->save();
+            // Update the status
+            $booking->status = $request->status;
+            $booking->save();
 
-        return response()->json([
-            'message' => 'Booking status updated successfully.',
-            'booking' => $booking,
-        ]);
+            return response()->json([
+                'message' => 'Booking status updated successfully.',
+                'booking' => $booking,
+            ]);
+        } catch (Exception $e) {
+            $e->getMessage();
+        }
     }
 }
