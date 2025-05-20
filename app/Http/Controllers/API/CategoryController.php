@@ -87,14 +87,18 @@ class CategoryController extends Controller
             return Helper::jsonErrorResponse('Failed to retrieve category', 500);
         }
     }
-    //trending category create event booking wish 
+
     public function trending()
     {
-        $trendingCategories = Category::with([
-            'events' => function ($query) {
-                $query->select('id', 'category_id', 'name', 'price', 'location', 'image');
-            }
-        ])
+        $trendingCategories = Category::whereHas('events', function ($query) {
+            $query->whereHas('bookings'); 
+        })
+            ->with([
+                'events' => function ($query) {
+                    $query->select('id', 'category_id', 'name', 'price', 'location', 'image')
+                        ->whereHas('bookings'); 
+                }
+            ])
             ->withCount(['events as total_bookings' => function ($query) {
                 $query->join('bookings', 'events.id', '=', 'bookings.event_id');
             }])

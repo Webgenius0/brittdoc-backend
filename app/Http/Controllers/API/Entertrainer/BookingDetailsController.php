@@ -32,24 +32,48 @@ class BookingDetailsController extends Controller
     }
 
     //booked and completed  homePage
+    // public function bookingList(Request $request)
+    // {
+    //     try {
+    //         $status = $request->status ?? '';
+    //         $EntertainerEvnetIds = Event::where('user_id', Auth::user()->id)->get()->pluck('id');
+    //         $allBooking_completed = Booking::whereIn('event_id',  $EntertainerEvnetIds)
+    //             ->when($status, function ($q, $status) {
+    //                 $q->where('status', $status);
+    //             })
+    //             ->with('rating')
+    //             ->get();
+
+    //         return Helper::jsonResponse(true, 'Event Booked data fatched Successful', 200, $allBooking_completed);
+    //     } catch (Exception $e) {
+    //         return Helper::jsonErrorResponse('Event Booked data Retrived Failed', 403, [$e->getMessage()]);
+    //     }
+    // }
+
     public function bookingList(Request $request)
     {
         try {
             $status = $request->status ?? '';
-            $EntertainerEvnetIds = Event::where('user_id', Auth::user()->id)->get()->pluck('id');
+
+            $EntertainerEvnetIds = Event::where('user_id', Auth::user()->id)->pluck('id');
+
             $allBooking_completed = Booking::whereIn('event_id',  $EntertainerEvnetIds)
                 ->when($status, function ($q, $status) {
                     $q->where('status', $status);
                 })
-                ->with('rating')
+                ->with([
+                    'rating',
+                    'event' => function ($q) {
+                        $q->select('id', 'name', 'image', 'price', 'location');
+                    }
+                ])
                 ->get();
 
-            return Helper::jsonResponse(true, 'Event Booked data fatched Successful', 200, $allBooking_completed);
+            return Helper::jsonResponse(true, 'Event Booked data fetched successfully', 200, $allBooking_completed);
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse('Event Booked data Retrived Failed', 403, [$e->getMessage()]);
+            return Helper::jsonErrorResponse('Event Booked data retrieval failed', 403, [$e->getMessage()]);
         }
     }
-
 
 
     // Event booking details 

@@ -108,31 +108,56 @@ class VenueBookingController extends Controller
     }
 
 
-    //booked and completed  homePage
+    // //booked and completed  homePage
+    // public function bookingList(Request $request)
+    // {
+    //     try {
+    //         $status = $request->status ?? '';
+    //         $vanueHolderVenueIds = Venue::where('user_id', Auth::user()->id)->get()->pluck('id');
+    //         $allBooking_completed = Booking::whereIn('venue_id',  $vanueHolderVenueIds)
+    //             ->when($status, function ($q, $status) {
+    //                 $q->where('status', $status);
+    //             })
+    //             ->with('rating')
+    //             ->get();
+
+    //         return Helper::jsonResponse(true, 'Venue Booked data fatched Successful', 200, $allBooking_completed);
+    //     } catch (Exception $e) {
+    //         return Helper::jsonErrorResponse('Venue Booked data Retrived Failed', 403, [$e->getMessage()]);
+    //     }
+    // }
+
     public function bookingList(Request $request)
     {
         try {
             $status = $request->status ?? '';
-            $vanueHolderVenueIds = Venue::where('user_id', Auth::user()->id)->get()->pluck('id');
-            $allBooking_completed = Booking::whereIn('venue_id',  $vanueHolderVenueIds)
+            $venueHolderVenueIds = Venue::where('user_id', Auth::user()->id)->pluck('id');
+
+            $allBookingCompleted = Booking::whereIn('venue_id', $venueHolderVenueIds)
                 ->when($status, function ($q, $status) {
                     $q->where('status', $status);
                 })
-                ->with('rating')
+                ->with([
+                    'rating',
+                    'venue' => function ($q) {
+                        $q->select('id', 'name', 'location', 'image', 'price');
+                    }
+                ])
                 ->get();
 
-            return Helper::jsonResponse(true, 'Venue Booked data fatched Successful', 200, $allBooking_completed);
+            return Helper::jsonResponse(true, 'Venue booked data fetched successfully', 200, $allBookingCompleted);
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse('Venue Booked data Retrived Failed', 403, [$e->getMessage()]);
+            return Helper::jsonErrorResponse('Venue booked data retrieval failed', 403, [$e->getMessage()]);
         }
     }
+    
 
     // venue booking details 
     public function VenueBookingDetials($id)
     {
         try {
             $BookedDetails = Booking::with(['venue' => function ($q) {
-                $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
                 ->where('status', 'booked')
                 ->where('id', $id)
@@ -162,7 +187,7 @@ class VenueBookingController extends Controller
     {
         try {
             $completed = Booking::with(['venue' => function ($q) {
-                $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'name', 'image', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
                 ->where('status', 'completed')
                 ->where('id', $id)
@@ -229,7 +254,7 @@ class VenueBookingController extends Controller
         $now = Carbon::now();
 
         $bookings = Booking::with(['venue' => function ($q) {
-            $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')
+            $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
             ->where('status', 'booked')
@@ -274,7 +299,7 @@ class VenueBookingController extends Controller
         $now = Carbon::now();
 
         $bookings = Booking::with(['event' => function ($q) {
-            $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')
+            $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
             ->where('status', 'booked')
