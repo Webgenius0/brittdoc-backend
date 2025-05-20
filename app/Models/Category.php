@@ -8,7 +8,12 @@ class Category extends Model
 {
     protected $guarded = ['id'];
 
-    
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
     public function venues()
     {
         return $this->hasMany(Venue::class);

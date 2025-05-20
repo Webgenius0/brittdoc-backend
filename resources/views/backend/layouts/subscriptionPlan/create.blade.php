@@ -107,14 +107,14 @@
                             <div class="form-group mb-4">
                                 <label class="label text-secondary">Type Select</label>
                                 <div class="form-group position-relative">
-                                    <select name="type"
-                                        class="form-control text-dark ps-5 h-55 @error('type') is-invalid @enderror">
+                                    <select name="billing_cycle"
+                                        class="form-control text-dark ps-5 h-55 @error('billing_cycle') is-invalid @enderror">
                                         <option value="lifetime">lifetime</option>
                                         <option value="monthly">monthly</option>
                                     </select>
                                 </div>
-                                @error('type')
-                                    <div id="type-error" class="text-danger">{{ $message }}</div>
+                                @error('billing_cycle')
+                                    <div id="billing_cycle-error" class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>

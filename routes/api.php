@@ -56,6 +56,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //Category API
     Route::get('/category', [CategoryController::class, 'index']);
     Route::get('/category/show/{id}', [CategoryController::class, 'show']);
+    Route::get('/trending-categories', [CategoryController::class, 'trending']);
+
     //Event
     Route::get('/event/user', [EventController::class, "index"]);
     Route::get('/event/booking/list/user', [BookingController::class, "index"]);

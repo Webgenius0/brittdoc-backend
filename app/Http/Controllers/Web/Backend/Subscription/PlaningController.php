@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\Backend\Subscription;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Planing;
 use Exception;
@@ -62,18 +63,20 @@ class PlaningController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
-                'image' => 'nullable|string',
+                'image' => 'nullable',
                 'description' => 'nullable|string',
                 'price' => 'required|numeric',
                 'billing_cycle' => 'required|in:lifetime,monthly',
             ]);
-// dd($validator);
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
             }
+            if ($request->hasFile('image')) {
+                $validatedData['image'] = Helper::fileUpload($request->file('image'), 'category', time() . '_' . getFileName($request->file('image')));
+            }
 
             $planing = Planing::create($request->all());
-            return response()->json($planing, 201);
+            return redirect()->route('planning.index');
         } catch (Exception $e) {
             return response()->json([
                 $e->getMessage()
