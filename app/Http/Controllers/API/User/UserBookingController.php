@@ -63,7 +63,6 @@ class UserBookingController extends Controller
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
             ->where('status', 'booked')
-            ->where('user_id', Auth::user()->id)
             ->get();
 
         //  status query 

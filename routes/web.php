@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\Backend\CategoryController;
 use App\Http\Controllers\Web\Backend\PrivacyPolicyController;
+use App\Http\Controllers\Web\Backend\Subscription\PlaningController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
@@ -53,3 +54,9 @@ Route::post('/run-command', function (Request $request) {
     // Return the output to the view
     return redirect()->route('run.command.form')->with('output', $output);
 })->name('run.command');
+
+
+//
+Route::resource('/planning', PlaningController::class);
+Route::post('/planning/status/{id}', [PlaningController::class, 'status'])->name('planning.status');
+
