@@ -11,9 +11,10 @@
     </style>
 @endpush
 @section('content')
+
     <div class="main-content-container overflow-hidden">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-            <h3 class="mb-0">subscription Planning Page</h3>
+            <h3 class="mb-0">User Planning Page</h3>
 
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                 <ol class="breadcrumb align-items-center mb-0 lh-1">
@@ -24,35 +25,34 @@
                         </a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <span class="fw-medium">subscription Page</span>
+                        <span class="fw-medium">User Planning Page</span>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <span class="fw-medium">Add</span>
+                        <span class="fw-medium">User Planning </span>
                     </li>
                 </ol>
             </nav>
         </div>
 
-
         <div class="card bg-white border-0 rounded-3 mb-4">
             <div class="card-body p-4">
+
+
                 <div class="mb-4">
-                    <h4 class="fs-20 mb-1">subscription Create Page</h4>
-                    <p class="fs-15">Add New subscription Create here.</p>
+                    <h4 class="fs-20 mb-1">User Planning Page</h4>
+                    <p class="fs-15">User Planning Create Or Update here.</p>
                 </div>
-                {{-- from start --}}
-                <form action="{{ route('planning.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{  route('user.planingStore') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('POST')
                     <div class="row">
-
                         <div class="col-lg-12">
                             <div class="form-group mb-4">
                                 <label class="label text-secondary">Title</label>
                                 <div class="form-group position-relative">
                                     <input type="text"
                                         class="form-control text-dark ps-5 h-55 @error('title') is-invalid @enderror"
-                                        name="title" value="{{ old('title') }}" placeholder="Enter subscription title here">
+                                        name="title" value="{{ $data->title ?? " " }}" placeholder="Enter section title here">
                                 </div>
                                 @error('title')
                                     <div id="title-error" class="text-danger">{{ $message }}</div>
@@ -62,11 +62,10 @@
 
                         <div class="col-lg-12">
                             <div class="form-group mb-4">
-                                <label class="label text-secondary">subscription Description</label>
+                                <label class="label text-secondary">Description</label>
                                 <div class="form-group position-relative">
-                                    <input type="text"
-                                        class="form-control text-dark ps-5 h-55 @error('description') is-invalid @enderror"
-                                        name="description" value="{{ old('description') }}" placeholder="Enter subscription description here">
+                                    <textarea name="description" class="form-control @error('description') is-invalid @enderror" id="page_content"
+                                        placeholder="description here">{{ $data->description ?? " " }}</textarea>
                                 </div>
                                 @error('description')
                                     <div id="description-error" class="text-danger">{{ $message }}</div>
@@ -74,13 +73,14 @@
                             </div>
                         </div>
 
+
                         <div class="col-lg-12">
                             <div class="form-group mb-4">
                                 <label class="label text-secondary">Price</label>
                                 <div class="form-group position-relative">
                                     <input type="number"
-                                        class="form-control text-dark ps-5 h-55 @error('description') is-invalid @enderror"
-                                        name="price" value="{{ old('price') }}" placeholder="Enter subscription price here">
+                                        class="form-control text-dark ps-5 h-55 @error('price') is-invalid @enderror"
+                                        name="price" value="{{ $data->price ?? " " }}" placeholder="Enter section price here">
                                 </div>
                                 @error('price')
                                     <div id="price-error" class="text-danger">{{ $message }}</div>
@@ -88,44 +88,26 @@
                             </div>
                         </div>
 
-
                         <div class="col-lg-12">
                             <div class="form-group ">
-                                <label class="label text-secondary mb-1"> subscription Image<span
-                                        class="text-danger">*</span></label>
+                                <label class="label text-secondary mb-1"> Image<span class="text-danger">*</span></label>
                                 <input class="dropify form-control @error('image') is-invalid @enderror" type="file"
-                                    name="image" accept="image/*"
-                                    data-default-file="{{ isset($data) && $data->image ? asset($data->image) : '' }}">
+                                    name="image" data-default-file="{{ isset($data->image) ? asset($data->image) : '' }}"
+                                    accept="image/*">
+
                                 @error('image')
                                     <div id="image-error" class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
 
-
-                        <div class="col-lg-12">
-                            <div class="form-group mb-4">
-                                <label class="label text-secondary">Type Select</label>
-                                <div class="form-group position-relative">
-                                    <select name="billing_cycle"
-                                        class="form-control text-dark ps-5 h-55 @error('billing_cycle') is-invalid @enderror">
-                                        <option value="lifetime">lifetime</option>
-                                        <option value="monthly">monthly</option>
-                                    </select>
-                                </div>
-                                @error('billing_cycle')
-                                    <div id="billing_cycle-error" class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-
                     </div>
+
                     <div class="row mt-3">
                         <div class="col-lg-12">
                             <div class="d-flex flex-wrap gap-3">
                                 <button type="reset" class="btn btn-danger py-2 px-4 fw-medium fs-16 text-white"
-                                    onclick="window.location.href='{{ route('planning.index') }}'">Cancel</button>
+                                    onclick="window.location.href='{{ route('user.planing') }}'">Cancel</button>
                                 <button type="submit" class="btn btn-primary py-2 px-4 fw-medium fs-16"> <i
                                         class="ri-check-line text-white fw-medium"></i> Submit</button>
                             </div>
@@ -141,8 +123,7 @@
     <script>
         ClassicEditor
             .create(document.querySelector('#page_content'), {
-                removePlugins: ['CKFinderUploadAdapter', 'CKFinder', 'EasyImage', 'ImageUpload', 'MediaEmbed'],
-                toolbar: ['bold', 'italic', 'heading', '|', 'undo', 'redo']
+
             })
             .catch(error => {
                 console.error(error);

@@ -56,7 +56,8 @@ Route::post('/run-command', function (Request $request) {
 })->name('run.command');
 
 
-//
-Route::resource('/planning', PlaningController::class);
-Route::post('/planning/status/{id}', [PlaningController::class, 'status'])->name('planning.status');
+Route::get('/lifetime/planning', [PlaningController::class, 'userPlaning'])->name('user.planing');
+Route::post('/lifetime/planing/store', [PlaningController::class, 'createLifetimePlan'])->name('user.planingStore');
 
+Route::get('/monthly/planning', [PlaningController::class, 'MonthlyPlaning'])->name('Entertainer.VenueHolder.planing');
+Route::post('/monthly/planning/store', [PlaningController::class, 'MonthlyPlaningCreate'])->name('Entertainer.VenueHolder.planing.store');

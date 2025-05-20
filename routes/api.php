@@ -13,6 +13,7 @@ use App\Http\Controllers\API\Entertrainer\BookingDetailsController;
 use App\Http\Controllers\API\Entertrainer\EventController;
 use App\Http\Controllers\API\Payment\PaymentController;
 use App\Http\Controllers\API\RatingController;
+use App\Http\Controllers\API\Subscription\SubscriptionController;
 use App\Http\Controllers\API\User\HomeController;
 use App\Http\Controllers\API\User\UserBookingController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
@@ -53,6 +54,10 @@ Route::group(['middleware' => 'auth:api'], function ($router) {
 
 // only for user
 Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router) {
+    //subscription
+    Route::get('/lifetime/subscription/planning', [SubscriptionController::class, 'lifetime']);
+    Route::post('/lifetime/subscription/store', [SubscriptionController::class, 'Subscription']);
+
     //Category API
     Route::get('/category', [CategoryController::class, 'index']);
     Route::get('/category/show/{id}', [CategoryController::class, 'show']);
@@ -93,6 +98,9 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
 
 //only for entertrainer
 Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($router) {
+    //subscription
+    Route::get('/monthly/subscription/planning', [SubscriptionController::class, 'monthly']);
+    Route::post('/monthly/subscription/store', [SubscriptionController::class, 'Subscription']);
     //Category API
     Route::get('/Entertrainer/category', [EventController::class, 'SubCategory']);
     Route::post('/Entertrainer/category/create', [EventController::class, 'SubCategoryCreate']);
@@ -113,6 +121,9 @@ Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($
 
 //only for venue holder
 Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function ($router) {
+    //subscription
+    Route::get('/venue/monthly/subscription/planning', [SubscriptionController::class, 'monthly']);
+    Route::post('/venue/monthly/subscription/store', [SubscriptionController::class, 'Subscription']);
     //Category API
     Route::get('/venue_holder/category', [VenueController::class, 'SubCategory']);
     Route::post('/venue_holder/category/create', [VenueController::class, 'SubCategoryCreate']);
@@ -164,5 +175,4 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::get('/privacy-policy', [HomePageController::class, 'privacyList']);
 
     Route::get('/booking/status-update', [BookingController::class, 'status']);
-
 });

@@ -41,29 +41,31 @@ $systemSetting = App\Models\SystemSetting::first();
                 </a>
             </li> --}}
 
-            <li class="menu-item {{ request()->routeIs('planning.*') ? 'open' : '' }}">
+            <li class="menu-item {{ request()->routeIs('user.planing.*') ? 'open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle active">
                     <span class="material-symbols-outlined menu-icon">help</span>
-                    <span class="title">Subscription Plan</span>
+                    <span class="title">Subcription</span>
                 </a>
                 <ul class="menu-sub">
                     <!-- Account Settings Submenu -->
                     <li class="menu-item ">
-                        <a href="{{ route('planning.index') }}"
-                            class="menu-link {{ request()->routeIs('planning.index') ? 'active' : '' }} ">
-                            Subscription Plan List
+                        <a href="{{ route('user.planing') }}"
+                            class="menu-link {{ request()->routeIs('user.planing') ? 'active' : '' }} ">
+                            User LifeTime Planning
                         </a>
                     </li>
                     <!-- Change Password Submenu -->
                     <li class="menu-item">
-                        <a href="{{ route('planning.create') }}"
-                            class="menu-link {{ request()->routeIs('planning.create') ? 'active' : '' }}">
-                            Add New Subscription Plan
+                        <a href="{{ route('Entertainer.VenueHolder.planing') }}"
+                            class="menu-link {{ request()->routeIs('Entertainer.VenueHolder.planing') ? 'active' : '' }}">
+                           Monthly Planning
                         </a>
                     </li>
-
+                    <!-- Change Password Submenu -->
+                   
                 </ul>
             </li>
+
             <!-- Faqs Menu Item -->
             <li class="menu-item {{ request()->routeIs('faqs.*') ? 'open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle active">
