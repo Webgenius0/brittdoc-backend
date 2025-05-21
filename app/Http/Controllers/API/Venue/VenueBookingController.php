@@ -140,7 +140,7 @@ class VenueBookingController extends Controller
                 ->with([
                     'rating',
                     'venue' => function ($q) {
-                        $q->select('id', 'name', 'location', 'image', 'price');
+                        $q->select('id', 'name','about', 'location', 'image', 'price');
                     }
                 ])
                 ->get();
@@ -186,7 +186,7 @@ class VenueBookingController extends Controller
     {
         try {
             $completed = Booking::with(['venue' => function ($q) {
-                $q->select('id', 'category_id', 'name', 'image', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'name', 'about','image', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
                 ->where('status', 'completed')
                 ->where('id', $id)
@@ -253,7 +253,7 @@ class VenueBookingController extends Controller
         $now = Carbon::now();
 
         $bookings = Booking::with(['venue' => function ($q) {
-            $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
+            $q->select('id', 'category_id', 'about', 'image', 'name', 'start_date', 'ending_date')
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
             ->where('status', 'booked')
@@ -298,7 +298,7 @@ class VenueBookingController extends Controller
         $now = Carbon::now();
 
         $bookings = Booking::with(['event' => function ($q) {
-            $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
+            $q->select('id', 'category_id', 'image', 'about','name', 'start_date', 'ending_date')
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
             ->where('status', 'booked')
