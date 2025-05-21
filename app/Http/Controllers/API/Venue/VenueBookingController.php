@@ -132,7 +132,7 @@ class VenueBookingController extends Controller
         try {
             $status = $request->status ?? '';
             $venueHolderVenueIds = Venue::where('user_id', Auth::user()->id)->pluck('id');
-
+            $venueHolder = Venue::where('user_id', Auth::user()->id)->get()->pluck('id');
             $allBookingCompleted = Booking::whereIn('venue_id', $venueHolderVenueIds)
                 ->when($status, function ($q, $status) {
                     $q->where('status', $status);
@@ -143,6 +143,7 @@ class VenueBookingController extends Controller
                         $q->select('id', 'name', 'location', 'image', 'price');
                     }
                 ])
+                ->whereIn('venue_id', $venueHolder)
                 ->get();
 
             return Helper::jsonResponse(true, 'Venue booked data fetched successfully', 200, $allBookingCompleted);
@@ -150,15 +151,18 @@ class VenueBookingController extends Controller
             return Helper::jsonErrorResponse('Venue booked data retrieval failed', 403, [$e->getMessage()]);
         }
     }
-    
+
 
     // venue booking details 
     public function VenueBookingDetials($id)
     {
         try {
-            $BookedDetails = Booking::with(['venue' => function ($q) {
-                $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
-            }, 'user:id,name,avatar'])
+            $BookedDetails = Booking::with([
+                'venue' => function ($q) {
+                    $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
+                },
+                'user:id,name,avatar'
+            ])
                 ->where('status', 'booked')
                 ->where('id', $id)
                 ->first();
@@ -186,9 +190,12 @@ class VenueBookingController extends Controller
     public function venueCompletedDetails($id)
     {
         try {
-            $completed = Booking::with(['venue' => function ($q) {
-                $q->select('id', 'category_id', 'name', 'image', 'start_date', 'ending_date')->with(['category:id,name']);
-            }, 'user:id,name,avatar'])
+            $completed = Booking::with([
+                'venue' => function ($q) {
+                    $q->select('id', 'category_id', 'name', 'image', 'start_date', 'ending_date')->with(['category:id,name']);
+                },
+                'user:id,name,avatar'
+            ])
                 ->where('status', 'completed')
                 ->where('id', $id)
                 ->with('rating')
@@ -253,10 +260,14 @@ class VenueBookingController extends Controller
         $status = $request->query('status');
         $now = Carbon::now();
 
-        $bookings = Booking::with(['venue' => function ($q) {
-            $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
-                ->with('category:id,name');
-        }, 'user:id,name,avatar', 'rating'])
+        $bookings = Booking::with([
+            'venue' => function ($q) {
+                $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
+                    ->with('category:id,name');
+            },
+            'user:id,name,avatar',
+            'rating'
+        ])
             ->where('status', 'booked')
             ->where('user_id', Auth::user()->id)
             ->get();
@@ -273,7 +284,8 @@ class VenueBookingController extends Controller
         $filtered = $bookings->filter(function ($booking) use ($status, $now) {
             $this->applyTimeStatus($booking);
 
-            if (!$booking->venue) return false;
+            if (!$booking->venue)
+                return false;
 
             $venueStart = Carbon::parse($booking->venue->start_date);
             $venueEnd = Carbon::parse($booking->venue->ending_date);
@@ -298,10 +310,14 @@ class VenueBookingController extends Controller
         $status = $request->query('status');
         $now = Carbon::now();
 
-        $bookings = Booking::with(['event' => function ($q) {
-            $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
-                ->with('category:id,name');
-        }, 'user:id,name,avatar', 'rating'])
+        $bookings = Booking::with([
+            'event' => function ($q) {
+                $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
+                    ->with('category:id,name');
+            },
+            'user:id,name,avatar',
+            'rating'
+        ])
             ->where('status', 'booked')
             ->where('user_id', Auth::user()->id)
             ->get();
@@ -318,7 +334,8 @@ class VenueBookingController extends Controller
         $filtered = $bookings->filter(function ($booking) use ($status, $now) {
             $this->applyTimeStatus($booking);
 
-            if (!$booking->event) return false;
+            if (!$booking->event)
+                return false;
 
             $eventStart = Carbon::parse($booking->event->start_date);
             $eventEnd = Carbon::parse($booking->event->ending_date);
