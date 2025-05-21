@@ -11,6 +11,7 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\Entertrainer\BookingController;
 use App\Http\Controllers\API\Entertrainer\BookingDetailsController;
 use App\Http\Controllers\API\Entertrainer\EventController;
+use App\Http\Controllers\API\Message\MessageController;
 use App\Http\Controllers\API\Payment\PaymentController;
 use App\Http\Controllers\API\RatingController;
 use App\Http\Controllers\API\Subscription\SubscriptionController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\API\V1\User\UserFaqController;
 use App\Http\Controllers\API\Venue\VenueBookingController;
 use App\Http\Controllers\API\Venue\VenueController;
 use App\Http\Controllers\Web\Backend\PrivacyPolicyController;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -175,4 +177,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::get('/privacy-policy', [HomePageController::class, 'privacyList']);
 
     Route::get('/booking/status-update', [BookingController::class, 'status']);
+    //message 
+    Route::post('/messages/send', [MessageController::class, 'sendMessage']);
+    Route::get('/messages/group', [MessageController::class, 'GroupMessage']);      //convension 2-3 sender and reciver only
+    Route::get('/messages/listMessage', [MessageController::class, 'listMessage']); //user id all message show
 });

@@ -157,9 +157,8 @@ class VenueBookingController extends Controller
     {
         try {
             $BookedDetails = Booking::with(['venue' => function ($q) {
-                $q->select('id', 'category_id', 'image', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'image','about', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
-                ->where('status', 'booked')
                 ->where('id', $id)
                 ->first();
             // dd($BookedDetails->toArray());
