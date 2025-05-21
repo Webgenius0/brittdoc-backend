@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\User;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Venue;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,11 +58,17 @@ class UserBookingController extends Controller
     {
         $status = $request->query('status');
         $now = Carbon::now();
-
-        $bookings = Booking::with(['venue' => function ($q) {
-            $q->select('id', 'category_id','image', 'name', 'start_date', 'ending_date')
-                ->with('category:id,name');
-        }, 'user:id,name,avatar', 'rating'])
+        $venueHolder = Venue::where('user_id', Auth::user()->id)->get()->pluck('id');
+        $bookings = Booking::with([
+            'venue' => function ($q) {
+                $q->select('id', 'user_id', 'category_id', 'image', 'name', 'start_date', 'ending_date')
+                    ->where('user_id', Auth::user()->id)
+                    ->with('category:id,name');
+            },
+            'user:id,name,avatar',
+            'rating'
+        ])
+            ->whereIn('venue_id', $venueHolder)
             ->where('status', 'booked')
             ->get();
 
@@ -77,7 +84,8 @@ class UserBookingController extends Controller
         $filtered = $bookings->filter(function ($booking) use ($status, $now) {
             $this->applyTimeStatus($booking);
 
-            if (!$booking->venue) return false;
+            if (!$booking->venue)
+                return false;
 
             $venueStart = Carbon::parse($booking->venue->start_date);
             $venueEnd = Carbon::parse($booking->venue->ending_date);

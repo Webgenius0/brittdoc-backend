@@ -132,7 +132,7 @@ class VenueBookingController extends Controller
         try {
             $status = $request->status ?? '';
             $venueHolderVenueIds = Venue::where('user_id', Auth::user()->id)->pluck('id');
-
+            
             $allBookingCompleted = Booking::whereIn('venue_id', $venueHolderVenueIds)
                 ->when($status, function ($q, $status) {
                     $q->where('status', $status);
@@ -143,14 +143,14 @@ class VenueBookingController extends Controller
                         $q->select('id', 'name','about', 'location', 'image', 'price');
                     }
                 ])
-                ->get();
+                                ->get();
 
             return Helper::jsonResponse(true, 'Venue booked data fetched successfully', 200, $allBookingCompleted);
         } catch (Exception $e) {
             return Helper::jsonErrorResponse('Venue booked data retrieval failed', 403, [$e->getMessage()]);
         }
     }
-    
+
 
     // venue booking details 
     public function VenueBookingDetials($id)
@@ -272,7 +272,7 @@ class VenueBookingController extends Controller
         $filtered = $bookings->filter(function ($booking) use ($status, $now) {
             $this->applyTimeStatus($booking);
 
-            if (!$booking->venue) return false;
+            if (!$booking->venue)                 return false;
 
             $venueStart = Carbon::parse($booking->venue->start_date);
             $venueEnd = Carbon::parse($booking->venue->ending_date);
@@ -317,7 +317,7 @@ class VenueBookingController extends Controller
         $filtered = $bookings->filter(function ($booking) use ($status, $now) {
             $this->applyTimeStatus($booking);
 
-            if (!$booking->event) return false;
+            if (!$booking->event)                 return false;
 
             $eventStart = Carbon::parse($booking->event->start_date);
             $eventEnd = Carbon::parse($booking->event->ending_date);
