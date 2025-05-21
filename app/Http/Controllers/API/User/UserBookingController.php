@@ -59,10 +59,11 @@ class UserBookingController extends Controller
         $now = Carbon::now();
 
         $bookings = Booking::with(['venue' => function ($q) {
-            $q->select('id', 'category_id','image', 'name', 'start_date', 'ending_date')
+            $q->select('id','user_id', 'category_id','image', 'name', 'start_date', 'ending_date')
+                ->where('user_id', Auth::user()->id)
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
-            ->where('status', 'booked')
+            // ->where('status', 'booked')
             ->get();
 
         //  status query 

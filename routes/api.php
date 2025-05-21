@@ -96,6 +96,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('/user/event/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming1"]);
 });
 
+
 //only for entertrainer
 Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($router) {
     //subscription
