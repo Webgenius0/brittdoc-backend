@@ -100,43 +100,65 @@ class MessageController extends Controller
     // }
 
     //----------------------------------------------------------------------------
-    public function send(Request $request)
+    public function sendMessage(Request $request)
     {
-        $receiverId = $request->receiver_id;
+        try {
+            $request->validate([
+                'receiver_id' => 'required|exists:users,id',
+                'booking_id' => 'required|exists:bookings,id',
+                'content' => 'required',
+            ]);
 
-        // Check booking exists between sender & event
-        $receiverIsEventHolder = Event::where('user_id', $receiverId)
-            ->whereHas('bookings', function ($q) {
-                $q->where('user_id', Auth::user()->id);
-            })->exists();
+            $conversion_id = Auth::id() < $request->receiver_id
+                ? Auth::id() . '-' . $request->receiver_id . '-' . $request->booking_id
+                : $request->receiver_id . '-' . Auth::id() . '-' . $request->booking_id;
 
-        $senderIsEventHolder = Event::where('user_id', Auth::user()->id)
-            ->whereHas('bookings', function ($q) use ($receiverId) {
-                $q->where('user_id', $receiverId);
-            })->exists();
+            $message = Message::create([
+                'sender_id' => Auth::user()->id,
+                'receiver_id' => $request->input('receiver_id'),
+                'booking_id' => $request->input('booking_id'),
+                'conversion_id' => $conversion_id,
+                'content' => $request->input('content'),
+            ]);
 
-        if (!($receiverIsEventHolder || $senderIsEventHolder)) {
-            return response()->json(['message' => 'No valid booking between users'], 403);
+            return Helper::jsonResponse(true, 'Sending Message successfully', 201, $message);
+        } catch (\Exception $e) {
+            return Helper::jsonErrorResponse('NOt Sending Message !', 403, [$e->getMessage()]);
         }
-
-        $message = Message::create([
-            'sender_id' => Auth::user()->id,
-            'receiver_id' => $receiverId,
-            'message' => $request->message,
-        ]);
-
-        return response()->json($message);
     }
 
-    // Get messages with user
-    public function geting($userId)
-    {
-        $messages = Message::where(function ($q) use ($userId) {
-            $q->where('sender_id', Auth::user()->id)->where('receiver_id', $userId);
-        })->orWhere(function ($q) use ($userId) {
-            $q->where('sender_id', $userId)->where('receiver_id', Auth::user()->id);
-        })->orderBy('created_at')->get();
 
-        return response()->json($messages);
+
+
+
+
+
+
+    //------
+    public function getMessage(Request $request)
+    {
+        try {
+            $request->validate([
+                'sender_id' => 'required',
+            ]);
+
+            $sender_id = $request->input('sender_id');
+            $auth_id = Auth::user()->id;
+
+            $messages = Message::with(['booking.event:id,name'])
+                ->where(function ($query) use ($sender_id, $auth_id) {
+                    $query->where('sender_id', $sender_id)->where('receiver_id', $auth_id)
+                        ->orWhere(function ($q) use ($sender_id, $auth_id) {
+                            $q->where('sender_id', $auth_id)->where('receiver_id', $sender_id);
+                        });
+                })
+                ->with('rating:id,name,rating')
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            return Helper::jsonResponse(true, 'Messages fetched successfully.', 200, $messages);
+        } catch (\Exception $e) {
+            return Helper::jsonErrorResponse('Message fetching failed', 403, [$e->getMessage()]);
+        }
     }
 }

@@ -160,6 +160,7 @@ class VenueBookingController extends Controller
                 $q->select('id', 'category_id', 'image','description', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
                 ->where('id', $id)
+                ->with('rating')
                 ->first();
             // dd($BookedDetails->toArray());
             if (!$BookedDetails) {
