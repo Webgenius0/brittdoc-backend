@@ -96,9 +96,8 @@ class BookingController extends Controller
         try {
             $request->validate([
                 'booking_id' => 'required|exists:bookings,id',
-                'status' => 'required|in:booked,completed',
+                'status' => 'required|in:pending,upcoming,in-progress,booked,completed,cancelled',
             ]);
-
             $booking = Booking::find($request->booking_id);
 
             // Update the status
