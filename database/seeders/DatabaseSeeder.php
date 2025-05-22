@@ -48,5 +48,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(SystemSettingSeeder::class);
         $this->call(FaqSeeder::class);
+        $this->call(RestrictedWordsTableSeeder::class);
     }
 }

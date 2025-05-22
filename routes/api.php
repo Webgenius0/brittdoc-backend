@@ -159,7 +159,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::get('/faqs', [UserFaqController::class, 'list']);
     Route::post('/contact-support-message/sent', [UserContactSupportController::class, 'store']);
     // --------- cms part --------------
-    Route::get('/cms/social-link', [HomePageController::class, 'getSocialLinks']); //---ok
+    Route::get('/cms/social-link', [HomePageController::class, 'getSocialLinks']); 
     Route::get('/cms/system-info', [HomePageController::class, 'getSystemInfo']);
 
     // dynamic page
@@ -182,10 +182,10 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     //message 
     Route::post('/messages/send', [MessageController::class, 'sendMessage']);
     Route::get('/get/messages', [MessageController::class, 'getMessage']);
-    Route::get('/messages/group', [MessageController::class, 'GroupMessage']);      //convension 2-3 sender and reciver only
+    Route::get('/messages/group', [MessageController::class, 'GroupMessage']);      //convension 2-3-1 sender and reciver only
     Route::get('/messages/listMessage', [MessageController::class, 'listMessage']); //user id all message show
 
-    //testing per page 
-    Route::post('/send',[MessageController::class, 'send']);
-    Route::post('/geting',[MessageController::class, 'geting']);
+    //custom offer 
+    Route::post('/event/customer/offer', [EventController::class, "CustomerOffer"]);
+    Route::get('/event/customer/booked/{id}', [EventController::class, "StatusCustom"]);
 });
