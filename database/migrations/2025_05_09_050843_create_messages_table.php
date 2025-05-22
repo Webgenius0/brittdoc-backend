@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
-            $table->string('conversion_id'); 
+            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
+            $table->string('conversion_id');
             $table->text('content');
             $table->boolean('is_read')->default(false);
             $table->softDeletes();

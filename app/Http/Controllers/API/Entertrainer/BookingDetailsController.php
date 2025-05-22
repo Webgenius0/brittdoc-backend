@@ -31,25 +31,7 @@ class BookingDetailsController extends Controller
         ]);
     }
 
-    //booked and completed  homePage
-    // public function bookingList(Request $request)
-    // {
-    //     try {
-    //         $status = $request->status ?? '';
-    //         $EntertainerEvnetIds = Event::where('user_id', Auth::user()->id)->get()->pluck('id');
-    //         $allBooking_completed = Booking::whereIn('event_id',  $EntertainerEvnetIds)
-    //             ->when($status, function ($q, $status) {
-    //                 $q->where('status', $status);
-    //             })
-    //             ->with('rating')
-    //             ->get();
-
-    //         return Helper::jsonResponse(true, 'Event Booked data fatched Successful', 200, $allBooking_completed);
-    //     } catch (Exception $e) {
-    //         return Helper::jsonErrorResponse('Event Booked data Retrived Failed', 403, [$e->getMessage()]);
-    //     }
-    // }
-
+    // all Entertainser Event
     public function bookingList(Request $request)
     {
         try {
@@ -64,7 +46,7 @@ class BookingDetailsController extends Controller
                 ->with([
                     'rating',
                     'event' => function ($q) {
-                        $q->select('id', 'name', 'image', 'price', 'location');
+                        $q->select('id', 'name', 'about', 'image', 'price', 'location');
                     }
                 ])
                 ->get();
@@ -81,9 +63,8 @@ class BookingDetailsController extends Controller
     {
         try {
             $BookedDetails = Booking::with(['event' => function ($q) {
-                $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'name', 'about', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
-                ->where('status', 'booked')
                 ->where('id', $id)
                 ->first();
             // dd($BookedDetails->toArray());
@@ -111,7 +92,7 @@ class BookingDetailsController extends Controller
     {
         try {
             $completed = Booking::with(['event' => function ($q) {
-                $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'name', 'about', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
                 ->where('status', 'completed')
                 ->where('id', $id)
@@ -177,7 +158,7 @@ class BookingDetailsController extends Controller
         $now = Carbon::now();
 
         $bookings = Booking::with(['event' => function ($q) {
-            $q->select('id', 'category_id', 'name', 'start_date', 'ending_date')
+            $q->select('id', 'category_id', 'about', 'name', 'start_date', 'ending_date')
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
             ->where('status', 'booked')

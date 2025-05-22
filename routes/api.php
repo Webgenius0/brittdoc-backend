@@ -116,8 +116,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($
     Route::delete('/event/delete/{id}', [EventController::class, "destroy"]);
     //------------------
     Route::get('/event/homePage', [BookingDetailsController::class, "CountTotal"]);
-    Route::get('/Event/all/booking/complated', [BookingDetailsController::class, "bookingList"]);
-    Route::get('/booking/Event/details/{id}', [BookingDetailsController::class, "EventBookingDetials"]);
+    Route::get('/Entertainer/all/Event', [BookingDetailsController::class, "bookingList"]);
+    Route::get('/Single/Event/Details/{id}', [BookingDetailsController::class, "EventBookingDetials"]);
     Route::get('/completed/Event/details/{id}', [BookingDetailsController::class, "EventCompletedDetails"]);
     Route::get('/event/inprogress/upcomming', [BookingDetailsController::class, "InprogressUpcommings"]);
 });
@@ -178,8 +178,14 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::get('/privacy-policy', [HomePageController::class, 'privacyList']);
 
     Route::get('/booking/status-update', [BookingController::class, 'status']);
+
     //message 
     Route::post('/messages/send', [MessageController::class, 'sendMessage']);
+    Route::get('/get/messages', [MessageController::class, 'getMessage']);
     Route::get('/messages/group', [MessageController::class, 'GroupMessage']);      //convension 2-3 sender and reciver only
     Route::get('/messages/listMessage', [MessageController::class, 'listMessage']); //user id all message show
+
+    //testing per page 
+    Route::post('/send',[MessageController::class, 'send']);
+    Route::post('/geting',[MessageController::class, 'geting']);
 });
