@@ -231,13 +231,27 @@ class EventController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
+            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->with('bookings')->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Event not found',
                 ], 404);
             }
+
+            //check booking
+            $hasBooked = $event->bookings->contains(function ($booking) {
+                return $booking->status === 'booked';
+            });
+
+            if ($hasBooked) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Event cannot be deleted because it has active bookings.',
+                    'warning' => true,
+                ], 403);
+            }
+
 
             if ($event->image) {
                 $parsedUrl = parse_url($event->image, PHP_URL_PATH);

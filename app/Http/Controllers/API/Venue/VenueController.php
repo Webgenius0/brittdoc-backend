@@ -238,10 +238,23 @@ class VenueController extends Controller
     public function destroy(string $id)
     {
         try {
-            $venue = Venue::where('id', $id,)->where('user_id', Auth::user()->id)->first();
+            $venue = Venue::where('id', $id,)->where('user_id', Auth::user()->id)
+                ->with('bookings')
+                ->first();
             if (!$venue) {
                 return Helper::jsonResponse(false, 'Venue not found', 404);
             }
+
+            // Check booked
+            $hasBooked = $venue->bookings->contains(function ($booking) {
+                return $booking->status === 'booked';
+            });
+
+            if ($hasBooked) {
+                return Helper::jsonResponse(false, 'Venue cannot be deleted because it has active bookings.', 403);
+            }
+
+
             // Delete old images
             $oldImages = is_array($venue->image) ? $venue->image : json_decode($venue->image ?? '', true);
             if (!empty($oldImages)) {

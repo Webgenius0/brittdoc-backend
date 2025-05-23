@@ -15,6 +15,7 @@ use App\Http\Controllers\API\Message\MessageController;
 use App\Http\Controllers\API\Payment\PaymentController;
 use App\Http\Controllers\API\RatingController;
 use App\Http\Controllers\API\Subscription\SubscriptionController;
+use App\Http\Controllers\API\User\FilterController;
 use App\Http\Controllers\API\User\HomeController;
 use App\Http\Controllers\API\User\UserBookingController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
@@ -159,7 +160,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::get('/faqs', [UserFaqController::class, 'list']);
     Route::post('/contact-support-message/sent', [UserContactSupportController::class, 'store']);
     // --------- cms part --------------
-    Route::get('/cms/social-link', [HomePageController::class, 'getSocialLinks']); 
+    Route::get('/cms/social-link', [HomePageController::class, 'getSocialLinks']);
     Route::get('/cms/system-info', [HomePageController::class, 'getSystemInfo']);
 
     // dynamic page
@@ -188,4 +189,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     //custom offer 
     Route::post('/event/customer/offer', [EventController::class, "CustomerOffer"]);
     Route::get('/event/customer/booked/{id}', [EventController::class, "StatusCustom"]);
+
+    // fillter user section
+    Route::get('/filter/entertainer', [FilterController::class, 'filterEntertainer']);
+    Route::get('/filter/venue', [FilterController::class, 'filterVenue']);
 });

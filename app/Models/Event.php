@@ -8,7 +8,13 @@ class Event extends Model
 {
     protected $guarded = [];
 
-    
+    // protected $casts = [
+    //     'start_date' => 'date',
+    //     'ending_date' => 'date',
+    //     'available_start_time' => 'datetime:H:i:s',
+    //     'available_end_time' => 'datetime:H:i:s',
+    // ];
+
     public function getImageAttribute($value): string|null
     {
         if (filter_var($value, FILTER_VALIDATE_URL)) {
