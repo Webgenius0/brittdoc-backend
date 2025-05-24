@@ -97,6 +97,13 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('/entertainer/category/details/{id}', [EventController::class, "entertainerCategoryDetails"]);
     Route::post('/user/Enterianer/booking/{id}', [BookingController::class, "BookingEntertainer"]);
     Route::get('/user/event/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming1"]);
+
+    // fillter user section/homePage/event/show
+    Route::get('/filter/entertainer', [FilterController::class, 'filterEntertainer']);
+    Route::get('/filter/venue', [FilterController::class, 'filterVenue']);
+    //Nearby Search 
+    Route::get('/Venue/nearby/search', [FilterController::class, 'NearbySearchVenue']);
+    Route::get('/Event/nearby/search', [FilterController::class, 'NearbySearchEvent']);
 });
 
 
@@ -189,9 +196,4 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     //custom offer 
     Route::post('/event/customer/offer', [EventController::class, "CustomerOffer"]);
     Route::get('/event/customer/booked/{id}', [EventController::class, "StatusCustom"]);
-
-    // fillter user section/homePage/event/show
-    Route::get('/filter/entertainer', [FilterController::class, 'filterEntertainer']);
-    Route::get('/filter/venue', [FilterController::class, 'filterVenue']);
-    Route::get('/testing/status/change', [FilterController::class, 'StatusUpdateAuto']);
 });

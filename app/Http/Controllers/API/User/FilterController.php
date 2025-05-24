@@ -124,4 +124,71 @@ class FilterController extends Controller
             return Helper::jsonResponse(false, 'Server error: ' . $e->getMessage(), 500);
         }
     }
+
+    //venue nearby search
+    public function NearbySearchVenue(Request $request)
+    {
+        try {
+            $userLat = $request->input('latitude');
+            $userLng = $request->input('longitude');
+            $radius = 10;
+
+            $venues = Venue::selectRaw("*, 
+                        (6371 * acos(
+                            cos(radians(?)) * 
+                            cos(radians(latitude)) * 
+                            cos(radians(longitude) - radians(?)) + 
+                            sin(radians(?)) * 
+                            sin(radians(latitude))
+                        )) AS distance", [$userLat, $userLng, $userLat])
+                ->having("distance", "<=", $radius)
+                ->orderBy("distance")
+                ->get();
+            if ($venues->isEmpty()) {
+                return Helper::jsonResponse(false, 'Your Distance Not Found Venue', 404, []);
+            }
+
+            $venues->map(function ($venue) {
+                $venue->distance = round($venue->distance, 2) . ' km';
+                return $venue;
+            });
+            return Helper::jsonResponse(false, 'Nearby search Successfully', 200, $venues);
+        } catch (Exception $e) {
+            return Helper::jsonResponse(false, 'Server error: ' . $e->getMessage(), 500);
+        }
+    }
+
+
+    //Event nearby search
+    public function NearbySearchEvent(Request $request)
+    {
+        try {
+            $userLat = $request->input('latitude');
+            $userLng = $request->input('longitude');
+            $radius = 10;
+
+            $events = Event::selectRaw("*, 
+                        (6371 * acos(
+                            cos(radians(?)) * 
+                            cos(radians(latitude)) * 
+                            cos(radians(longitude) - radians(?)) + 
+                            sin(radians(?)) * 
+                            sin(radians(latitude))
+                        )) AS distance", [$userLat, $userLng, $userLat])
+                ->having("distance", "<=", $radius)
+                ->orderBy("distance")
+                ->get();
+            if ($events->isEmpty()) {
+                return Helper::jsonResponse(false, 'Your Distance Not Found Event', 404, []);
+            }
+
+            $events->map(function ($venue) {
+                $venue->distance = round($venue->distance, 2) . ' km';
+                return $venue;
+            });
+            return Helper::jsonResponse(false, 'Nearby search Successfully', 200, $events);
+        } catch (Exception $e) {
+            return Helper::jsonResponse(false, 'Server error: ' . $e->getMessage(), 500);
+        }
+    }
 }

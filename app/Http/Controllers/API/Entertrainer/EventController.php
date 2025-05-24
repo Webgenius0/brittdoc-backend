@@ -65,7 +65,7 @@ class EventController extends Controller
                 'ending_date' => 'required|date|after_or_equal:start_date',
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i|after:available_start_time',
-                'image' => 'nullable|image|max:2048',
+                'image' => 'nullable|image|max:20240',
                 'latitude' => 'nullable',
                 'longitude' => 'nullable',
             ]);
@@ -173,7 +173,7 @@ class EventController extends Controller
                 'ending_date' => 'nullable|date|after_or_equal:start_date',
                 'available_start_time' => 'nullable|date_format:H:i',
                 'available_end_time' => 'nullable|date_format:H:i|after:available_start_time',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20240',
                 'latitude' => 'nullable',
                 'longitude' => 'nullable',
             ]);
@@ -295,7 +295,7 @@ class EventController extends Controller
         try {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255|unique:categories,name',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240'
             ]);
 
             $validatedData['type'] = 'entertainer';

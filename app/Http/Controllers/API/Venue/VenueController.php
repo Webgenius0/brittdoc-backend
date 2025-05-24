@@ -64,7 +64,7 @@ class VenueController extends Controller
                 'ending_date' => 'required|date|after_or_equal:start_date',
                 'available_start_time' => 'required|date_format:H:i',
                 'available_end_time' => 'required|date_format:H:i|after:available_start_time',
-                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:4048',
+                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
                 'latitude' => 'nullable',
                 'longitude' => 'nullable',
 
@@ -173,7 +173,7 @@ class VenueController extends Controller
                 'available_date' => 'nullable|date',
                 'available_start_time' => 'nullable|date_format:H:i',
                 'available_end_time' => 'nullable|date_format:H:i',
-                'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4048',
+                'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
                 'latitude' => 'nullable',
                 'longitude' => 'nullable',
             ]);

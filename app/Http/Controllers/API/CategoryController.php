@@ -51,7 +51,7 @@ class CategoryController extends Controller
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255|unique:categories,name',
                 'type' => 'required|in:venue_holder,entertainer',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240'
             ]);
 
             if ($request->hasFile('image')) {
