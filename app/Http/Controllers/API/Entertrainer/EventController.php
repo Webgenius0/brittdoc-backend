@@ -331,11 +331,16 @@ class EventController extends Controller
             }
 
             $query = Event::query()->with(['user:id,name', 'category:id,name']);
+
             if ($searchName) {
-                $query->whereHas('user', function ($q) use ($searchName) {
-                    $q->where('name', 'like', "%{$searchName}%");
+                $query->where(function ($q) use ($searchName) {
+                    $q->where('name', 'like', "%{$searchName}%")
+                        ->orWhereHas('category', function ($q2) use ($searchName) {
+                            $q2->where('name', 'like', "%{$searchName}%");
+                        });
                 });
             }
+
 
             if (!empty($categoryIds)) {
                 $query->whereIn('category_id', $categoryIds);
