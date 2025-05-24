@@ -46,7 +46,7 @@ class BookingDetailsController extends Controller
                 ->with([
                     'rating',
                     'event' => function ($q) {
-                        $q->select('id', 'name', 'about', 'image', 'price', 'location');
+                        $q->select('id', 'name', 'category_id', 'about', 'image', 'price', 'location')->with('category:id,name,image,created_at');
                     }
                 ])
                 ->get();
@@ -63,7 +63,7 @@ class BookingDetailsController extends Controller
     {
         try {
             $BookedDetails = Booking::with(['event' => function ($q) {
-                $q->select('id', 'category_id', 'name', 'about', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'name', 'about', 'start_date', 'ending_date')->with('category:id,name,image,created_at');
             }, 'user:id,name,avatar'])
                 ->where('id', $id)
                 ->with('rating')
