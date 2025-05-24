@@ -190,7 +190,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::post('/event/customer/offer', [EventController::class, "CustomerOffer"]);
     Route::get('/event/customer/booked/{id}', [EventController::class, "StatusCustom"]);
 
-    // fillter user section
+    // fillter user section/homePage/event/show
     Route::get('/filter/entertainer', [FilterController::class, 'filterEntertainer']);
     Route::get('/filter/venue', [FilterController::class, 'filterVenue']);
+    Route::get('/testing/status/change', [FilterController::class, 'StatusUpdateAuto']);
 });

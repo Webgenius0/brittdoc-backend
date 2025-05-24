@@ -8,6 +8,14 @@ use App\Models\Event;
 use App\Models\Venue;
 use Exception;
 use Illuminate\Http\Request;
+//-----------------------
+use App\Models\Booking;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Carbon\Carbon;
 
 class FilterController extends Controller
 {

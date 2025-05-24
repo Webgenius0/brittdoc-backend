@@ -18,7 +18,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         try {
-            $events = Event::with('category:id,name,image')->select('id', 'name', 'image', 'location', 'price', 'category_id')->get();
+            $events = Event::with('category:id,name,image')->select('id', 'name', 'image', 'location', 'price', 'category_id')->with('rating')->get();
 
             return response()->json([
                 'success' => true,
@@ -58,7 +58,7 @@ class HomeController extends Controller
     public function venue(Request $request)
     {
         try {
-            $events = Venue::select('id', 'name', 'location', 'price', 'category_id', 'image')->get();
+            $events = Venue::select('id', 'name', 'location', 'price', 'category_id', 'image')->with('rating')->get();
 
             return response()->json([
                 'success' => true,
