@@ -106,6 +106,11 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //Nearby Search 
     Route::get('/Venue/nearby/search', [FilterController::class, 'NearbySearchVenue']);
     Route::get('/Event/nearby/search', [FilterController::class, 'NearbySearchEvent']);
+    //location
+    Route::get('/Entertainer/filter/location', [FilterController::class, 'locationEntertainer']);
+    Route::get('/Venue/filter/location', [FilterController::class, 'locationVenueHolder']);
+    Route::get('/Entertrainers/category', [EventController::class, 'SubCategory']);
+    Route::get('/venue_holders/category', [VenueController::class, 'SubCategory']);
 });
 
 
