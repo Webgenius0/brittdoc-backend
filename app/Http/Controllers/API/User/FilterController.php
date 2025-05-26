@@ -62,7 +62,7 @@ class FilterController extends Controller
             $events = $query->get();
 
             if ($events->isEmpty()) {
-                return Helper::jsonResponse(false, 'No matching Event found.', 404, []);
+                return Helper::jsonResponse(false, 'No matching Event found', 200, []);
             }
 
             return Helper::jsonResponse(true, 'All Booked Data Returned', 200, $events);
@@ -145,7 +145,7 @@ class FilterController extends Controller
                 ->orderBy("distance")
                 ->get();
             if ($venues->isEmpty()) {
-                return Helper::jsonResponse(false, 'Your Distance Not Found Venue', 404, []);
+                return Helper::jsonResponse(false, 'Your Distance Not Found Venue', 200, []);
             }
 
             $venues->map(function ($venue) {
@@ -179,7 +179,7 @@ class FilterController extends Controller
                 ->orderBy("distance")
                 ->get();
             if ($events->isEmpty()) {
-                return Helper::jsonResponse(false, 'Your Distance Not Found Event', 404, []);
+                return Helper::jsonResponse(false, 'Your Distance Not Found Event', 200, []);
             }
 
             $events->map(function ($venue) {
@@ -187,6 +187,34 @@ class FilterController extends Controller
                 return $venue;
             });
             return Helper::jsonResponse(false, 'Nearby search Successfully', 200, $events);
+        } catch (Exception $e) {
+            return Helper::jsonResponse(false, 'Server error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    //location get Entertainer
+    public function locationEntertainer()
+    {
+        try {
+            $events = Event::pluck('location')->unique()->values();
+            if ($events->isEmpty()) {
+                return Helper::jsonResponse(false, 'No locations found', 404, []);
+            }
+            return Helper::jsonResponse(true, 'Locations retrieved successfully', 200, $events);
+        } catch (Exception $e) {
+            return Helper::jsonResponse(false, 'Server error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    //location get venueholder
+    public function locationVenueHolder()
+    {
+        try {
+            $venues = Venue::pluck('location')->unique()->values();
+            if ($venues->isEmpty()) {
+                return Helper::jsonResponse(false, 'No locations found', 404, []);
+            }
+            return Helper::jsonResponse(true, 'Locations retrieved successfully', 200, $venues);
         } catch (Exception $e) {
             return Helper::jsonResponse(false, 'Server error: ' . $e->getMessage(), 500);
         }

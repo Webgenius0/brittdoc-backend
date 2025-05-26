@@ -34,6 +34,64 @@ class HomeController extends Controller
         }
     }
 
+
+    public function searchHomepage(Request $request)
+    {
+        try {
+            $searchName  = $request->search;
+            $categoryIds = $request->category_id;
+
+            if ($categoryIds) {
+                $categoryIds = is_array($categoryIds) ? $categoryIds : explode(',', $categoryIds);
+            }
+
+            // Search Events
+            $eventQuery = Event::query()->with(['user:id,name', 'category:id,name']);
+            if ($searchName) {
+                $eventQuery->where(function ($q) use ($searchName) {
+                    $q->where('name', 'like', "%{$searchName}%")
+                        ->orWhereHas('category', function ($q2) use ($searchName) {
+                            $q2->where('name', 'like', "%{$searchName}%");
+                        });
+                });
+            }
+
+            if ($categoryIds) {
+                $eventQuery->whereIn('category_id', $categoryIds);
+            }
+            $events = $eventQuery->get();
+            // Search Venues
+            $venueQuery = Venue::query()->with(['user:id,name', 'category:id,name']);
+
+            if ($searchName) {
+                $venueQuery->where(function ($q) use ($searchName) {
+                    $q->where('name', 'like', "%{$searchName}%");
+                });
+            }
+
+            if ($categoryIds) {
+                $venueQuery->whereIn('category_id', $categoryIds);
+            }
+
+            $venues = $venueQuery->get();
+
+            return response()->json([
+                'success' => true,
+                'events'  => $events,
+                'venues'  => $venues,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Search error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while searching.',
+            ], 500);
+        }
+    }
+
+
+
     public function entertainer(Request $request)
     {
         try {

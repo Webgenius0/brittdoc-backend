@@ -100,7 +100,7 @@ class User extends Authenticatable implements JWTSubject
     }
     public function subcription()
     {
-        return $this->hasMany(Subcription::class);
+        return $this->hasMany(subcription::class);
     }
 
     /**

@@ -74,6 +74,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('homePage/event/show', [HomeController::class, "index"]);
     Route::get('homePage/entertainer/show', [HomeController::class, "entertainer"]);
     Route::get('homePage/venue/show', [HomeController::class, "venue"]);
+    Route::get('/homePage/search/show', [HomeController::class, "searchHomepage"]);
+
     //venue details show 
     Route::get('/homePage/venue/details/{id}', [HomeController::class, "venueDetails"]);
     //user section venue details
@@ -104,6 +106,11 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //Nearby Search 
     Route::get('/Venue/nearby/search', [FilterController::class, 'NearbySearchVenue']);
     Route::get('/Event/nearby/search', [FilterController::class, 'NearbySearchEvent']);
+    //location
+    Route::get('/Entertainer/filter/location', [FilterController::class, 'locationEntertainer']);
+    Route::get('/Venue/filter/location', [FilterController::class, 'locationVenueHolder']);
+    Route::get('/Entertrainers/category', [EventController::class, 'SubCategory']);
+    Route::get('/venue_holders/category', [VenueController::class, 'SubCategory']);
 });
 
 
