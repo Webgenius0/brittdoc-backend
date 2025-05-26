@@ -197,8 +197,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     //message 
     Route::post('/messages/send', [MessageController::class, 'sendMessage']);
     Route::get('/get/messages', [MessageController::class, 'getMessage']);
-    Route::get('/messages/group', [MessageController::class, 'GroupMessage']);      //convension 2-3-1 sender and reciver only
-    Route::get('/messages/listMessage', [MessageController::class, 'listMessage']); //user id all message show
+    // Route::get('/messages/group', [MessageController::class, 'GroupMessage']);      //convension 2-3-1 sender and reciver only
+    Route::get('/messages/all-chats', [MessageController::class, 'chatList']); //user id all message show
 
     //custom offer 
     Route::post('/event/customer/offer', [EventController::class, "CustomerOffer"]);
