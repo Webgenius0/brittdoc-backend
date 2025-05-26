@@ -62,7 +62,7 @@ class FilterController extends Controller
             $events = $query->get();
 
             if ($events->isEmpty()) {
-                return Helper::jsonResponse(false, 'No matching Event found.', 404, []);
+                return Helper::jsonResponse(false, 'No matching Event found',200, []);
             }
 
             return Helper::jsonResponse(true, 'All Booked Data Returned', 200, $events);

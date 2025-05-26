@@ -74,6 +74,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('homePage/event/show', [HomeController::class, "index"]);
     Route::get('homePage/entertainer/show', [HomeController::class, "entertainer"]);
     Route::get('homePage/venue/show', [HomeController::class, "venue"]);
+    Route::get('/homePage/search/show', [HomeController::class, "searchHomepage"]);
+
     //venue details show 
     Route::get('/homePage/venue/details/{id}', [HomeController::class, "venueDetails"]);
     //user section venue details
