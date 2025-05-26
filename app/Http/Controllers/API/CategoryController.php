@@ -51,7 +51,7 @@ class CategoryController extends Controller
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255|unique:categories,name',
                 'type' => 'required|in:venue_holder,entertainer',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240'
             ]);
 
             if ($request->hasFile('image')) {
@@ -86,5 +86,30 @@ class CategoryController extends Controller
         } catch (Exception $e) {
             return Helper::jsonErrorResponse('Failed to retrieve category', 500);
         }
+    }
+
+    public function trending()
+    {
+        $trendingCategories = Category::whereHas('events', function ($query) {
+            $query->whereHas('bookings'); 
+        })
+            ->with([
+                'events' => function ($query) {
+                    $query->select('id', 'category_id', 'name', 'price', 'location', 'image')
+                        ->whereHas('bookings'); 
+                }
+            ])
+            ->withCount(['events as total_bookings' => function ($query) {
+                $query->join('bookings', 'events.id', '=', 'bookings.event_id');
+            }])
+            ->orderByDesc('total_bookings')
+            ->take(5)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Trending categories fetched successfully',
+            'data' => $trendingCategories
+        ]);
     }
 }

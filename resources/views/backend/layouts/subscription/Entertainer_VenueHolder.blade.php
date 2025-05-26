@@ -14,7 +14,7 @@
 
     <div class="main-content-container overflow-hidden">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-            <h3 class="mb-0">Privacy Policy Page</h3>
+            <h3 class="mb-0">monthly Planning Page</h3>
 
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                 <ol class="breadcrumb align-items-center mb-0 lh-1">
@@ -25,10 +25,10 @@
                         </a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <span class="fw-medium">Privacy Policy Page</span>
+                        <span class="fw-medium">monthly Planning Page</span>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <span class="fw-medium">Privacy Policy </span>
+                        <span class="fw-medium">monthly Planning </span>
                     </li>
                 </ol>
             </nav>
@@ -39,26 +39,23 @@
 
 
                 <div class="mb-4">
-                    <h4 class="fs-20 mb-1">Privacy Policy Page</h4>
-                    <p class="fs-15">Privacy Policy Create Or Update here.</p>
+                    <h4 class="fs-20 mb-1">monthly Planning Page</h4>
+                    <p class="fs-15">monthly Planning Create Or Update here.</p>
                 </div>
-                {{-- from start --}}
-                <form action="{{ route('privacy.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('Entertainer.VenueHolder.planing.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('POST')
                     <div class="row">
-
                         <div class="col-lg-12">
                             <div class="form-group mb-4">
-                                <label class="label text-secondary">Section Name</label>
+                                <label class="label text-secondary">Title</label>
                                 <div class="form-group position-relative">
                                     <input type="text"
-                                        class="form-control text-dark ps-5 h-55 @error('name') is-invalid @enderror"
-                                        name="name" value="{{ old('name', $data->name ?? " ") }}"
-                                        placeholder="Enter section name here">
+                                        class="form-control text-dark ps-5 h-55 @error('title') is-invalid @enderror"
+                                        name="title" value="{{ $data->title ?? " " }}" placeholder="Enter section title here">
                                 </div>
-                                @error('name')
-                                    <div id="name-error" class="text-danger">{{ $message }}</div>
+                                @error('title')
+                                    <div id="title-error" class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
@@ -68,10 +65,38 @@
                                 <label class="label text-secondary">Description</label>
                                 <div class="form-group position-relative">
                                     <textarea name="description" class="form-control @error('description') is-invalid @enderror" id="page_content"
-                                        placeholder="description here">{{ old('description', $data->description ?? " ") }}</textarea>
+                                        placeholder="description here">{{ $data->description ?? " " }}</textarea>
                                 </div>
                                 @error('description')
                                     <div id="description-error" class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-12">
+                            <div class="form-group mb-4">
+                                <label class="label text-secondary">Price</label>
+                                <div class="form-group position-relative">
+                                    <input type="number"
+                                        class="form-control text-dark ps-5 h-55 @error('price') is-invalid @enderror"
+                                        name="price" value="{{ $data->price ?? " " }}" placeholder="Enter section price here">
+                                </div>
+                                @error('price')
+                                    <div id="price-error" class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group ">
+                                <label class="label text-secondary mb-1"> Image<span class="text-danger">*</span></label>
+                                <input class="dropify form-control @error('image') is-invalid @enderror" type="file"
+                                    name="image" data-default-file="{{ isset($data->image) ? asset($data->image) : '' }}"
+                                    accept="image/*">
+
+                                @error('image')
+                                    <div id="image-error" class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
@@ -82,7 +107,7 @@
                         <div class="col-lg-12">
                             <div class="d-flex flex-wrap gap-3">
                                 <button type="reset" class="btn btn-danger py-2 px-4 fw-medium fs-16 text-white"
-                                    onclick="window.location.href='{{ route('privacy.index') }}'">Cancel</button>
+                                    onclick="window.location.href='{{ route('Entertainer.VenueHolder.planing') }}'">Cancel</button>
                                 <button type="submit" class="btn btn-primary py-2 px-4 fw-medium fs-16"> <i
                                         class="ri-check-line text-white fw-medium"></i> Submit</button>
                             </div>
@@ -103,5 +128,7 @@
             .catch(error => {
                 console.error(error);
             });
+
+        $('.dropify').dropify();
     </script>
 @endpush

@@ -134,16 +134,10 @@ class CategoryController extends Controller
             $data = Category::findOrFail($id);
             $data->update($validatedData);
 
-            return response()->json([
-                "success" => true,
-                "message" => "Category Updated Successfully"
-            ]);
+            return redirect()->route('category.index');
         } catch (Exception $e) {
             Log::error("CategoryController::update" . $e->getMessage());
-            return response()->json([
-                "success" => false,
-                "message" => "Category not Update"
-            ]);
+            return redirect()->back()->withInput()->withErrors([$e->getMessage()]);
         }
     }
 

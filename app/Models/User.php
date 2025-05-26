@@ -98,7 +98,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Event::class);
     }
-
+    public function subcription()
+    {
+        return $this->hasMany(subcription::class);
+    }
 
     /**
      * Get the attributes that should be cast.

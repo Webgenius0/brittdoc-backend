@@ -8,6 +8,7 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\CMS;
 use App\Models\DynamicPage;
+use App\Models\Privacy;
 use App\Models\SystemSetting;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -16,19 +17,25 @@ use Illuminate\Support\Facades\Log;
 
 class HomePageController extends Controller
 {
+    //privacy and policy get
+    public function privacyList()
+    {
+        $data = Privacy::first();
+        if ($data) {
+            // return Helper::jsonResponse(true, 'System data fetched successfully', 200, [
+            //     'id' => $data->id,
+            //     'name' => $data->name,
+            //     'description' => strip_tags($data->description),
+            //     'created_at' => $data->created_at,
+            //     'updated_at' => $data->updated_at,
+            // ]);
+            return Helper::jsonResponse(true, 'System data fetched successfully', 200, $data);
+        } else {
+            return Helper::jsonErrorResponse('No data found', 404);
+        }
+    }
 
-    /**
-     * Retrieves active social links for the home page.
-     *
-     * This method fetches and paginates the social links data associated with
-     * the home page's social link container. It includes the ID, title, image,
-     * and link URL of each social link. If no 'per_page' parameter is specified
-     * in the request, a default of 25 items per page is used.
-     *
-     * @param Request $request The incoming request instance.
-     * @return \Illuminate\Http\JsonResponse A JSON response containing the social links data or an error message.
-     */
-
+    //socialLinks 
     public function getSocialLinks(Request $request): JsonResponse
     {
         try {
@@ -110,5 +117,4 @@ class HomePageController extends Controller
             return Helper::jsonErrorResponse('Failed to retrieve Dynamic page data.', 403);
         }
     }
-
 }

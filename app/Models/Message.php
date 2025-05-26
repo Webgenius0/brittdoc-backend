@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Message extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['chat_room_id', 'sender_id', 'receiver_id', 'content', 'is_read', 'deleted_at', 'status'];
+    protected $fillable = ['sender_id', 'booking_id', 'conversion_id', 'receiver_id', 'content', 'is_read', 'deleted_at', 'status'];
 
     protected $casts = [
-        'chat_room_id' => 'integer',
         'sender_id' => 'integer',
         'receiver_id' => 'integer',
+        'booking_id' => 'integer',
         'content' => 'string',
         'is_read' => 'boolean',
         'deleted_at' => 'datetime',
@@ -33,5 +33,13 @@ class Message extends Model
     public function receiver()
     {
         return $this->belongsTo(User::class, 'receiver_id');
+    }
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
+    public function rating()
+    {
+        return $this->belongsTo(Rating::class);
     }
 }

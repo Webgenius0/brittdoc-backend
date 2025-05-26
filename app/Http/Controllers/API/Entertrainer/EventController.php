@@ -4,8 +4,12 @@ namespace App\Http\Controllers\API\Entertrainer;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Message;
+use App\Models\Venue;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,16 +17,15 @@ use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    //all entertainer event list 
     public function index(Request $request)
     {
         try {
             $search = $request->query('search', '');
             $per_page = $request->query('per_page', 100);
 
-            $query = Event::query();
+            $query = Event::with('category:id,name,image')->select('id', 'category_id', 'user_id', 'name', 'price', 'location', 'image', 'created_at');
 
             if (!empty($search)) {
                 $query->where(function ($q) use ($search) {
@@ -37,7 +40,7 @@ class EventController extends Controller
                 return Helper::jsonResponse(false, 'No event found for the given search.', 404);
             }
 
-            return Helper::jsonResponse(true, 'Event retrieved successfully.', 200, $event, true);
+            return Helper::jsonResponse(true, 'All List Event retrieved successfully.', 200, $event, true);
         } catch (Exception $e) {
             Log::error("EventController::index" . $e->getMessage());
             return Helper::jsonErrorResponse('Failed to retrieve Event', 500);
@@ -58,10 +61,13 @@ class EventController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'price' => 'required|numeric|min:0',
                 'about' => 'required|string|max:1200',
-                'available_date' => 'required|date',
+                'start_date' => 'required|date',
+                'ending_date' => 'required|date|after_or_equal:start_date',
                 'available_start_time' => 'required|date_format:H:i',
-                'available_end_time' => 'required|date_format:H:i',
-                'image' => 'nullable|image|max:2048',
+                'available_end_time' => 'required|date_format:H:i|after:available_start_time',
+                'image' => 'nullable|image|max:20240',
+                'latitude' => 'nullable',
+                'longitude' => 'nullable',
             ]);
 
             // Create a new event input
@@ -85,9 +91,12 @@ class EventController extends Controller
                 'category_id' => $category->id,
                 'price' => $request->input('price'),
                 'about' => $request->input('about'),
-                'available_date' => $request->input('available_date'),
+                'start_date' => $request->input('start_date'),
+                'ending_date' => $request->input('ending_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
                 'image' => $image,
             ]);
 
@@ -105,39 +114,19 @@ class EventController extends Controller
         }
     }
 
-
-
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //store
-    }
-
-    /**
-     * Display the specified resource.
+     * Entertainer Event Details 
      */
     public function show(string $id)
     {
         try {
-            $event = Event::where('id', $id)->with('user')->first();
+            $event = Event::where('id', $id)->with('category:id,name', 'user:id,name,avatar')->first();
             if (!$event) {
-                return Helper::jsonResponse(false, 'Event ID  not found.', 404);
+                return Helper::jsonResponse(false, 'Event ID  not found', 404);
             }
-           return response()->json([
-                'success' => true,
-                'message' => 'Event retrieved Details successfully',
-                'data' => $event,
-            ]);
+            return Helper::jsonResponse(true, "Event Details retrieved successfully", 200, $event);
         } catch (Exception $e) {
-            // Log::error("EventController::show" . $e->getMessage());
-            // return Helper::jsonErrorResponse('Failed to retrieve Event', 500);
-             return response()->json([
-                'error' => false,
-                'message' => 'Event not found',
-                $e->getMessage()
-            ]);
+            return Helper::jsonErrorResponse('Event not found', 500, [$e->getMessage()]);
         }
     }
 
@@ -155,28 +144,18 @@ class EventController extends Controller
                     'message' => 'Event not found',
                 ], 404);
             }
-            return response()->json([
-                'success' => true,
-                'message' => 'Event retrieved successfully',
-                'data' => $event,
-            ]);
+
+            return Helper::jsonResponse(true, "Event retrieved successfull", 200, $event);
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve event',
-                'error' => $e->getMessage(),
-            ]);
+            return Helper::jsonErrorResponse('Event not found', 500, [$e->getMessage()]);
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    //update
     public function update(Request $request, string $id)
     {
-        // dd($request->all());
         try {
-            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
+            $event = Event::where('id', $id)->where('user_id', Auth::user()->id)->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -185,18 +164,20 @@ class EventController extends Controller
             }
 
             $request->validate([
-                'name' => 'required|string|max:255|unique:events,name,' . $id,
-                'location' => 'required|string|max:255',
-                'category_id' => 'required|exists:categories,id',
-                'price' => 'required|numeric|min:0',
-                'about' => 'required|string|max:1200',
-                'available_date' => 'required|date',
-                'available_start_time' => 'required|date_format:H:i',
-                'available_end_time' => 'required|date_format:H:i',
-                'image' => 'nullable|image|max:2048',
+                'name' => 'nullable|string|max:255',
+                'location' => 'nullable|string|max:255',
+                'category_id' => 'nullable|exists:categories,id',
+                'price' => 'nullable|numeric|min:0',
+                'about' => 'nullable|string|max:1200',
+                'start_date' => 'nullable|date',
+                'ending_date' => 'nullable|date|after_or_equal:start_date',
+                'available_start_time' => 'nullable|date_format:H:i',
+                'available_end_time' => 'nullable|date_format:H:i|after:available_start_time',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20240',
+                'latitude' => 'nullable',
+                'longitude' => 'nullable',
             ]);
-
-            // check if the category is valid for venue holders
+            //category type check
             $category = Category::where('id', $request->category_id)
                 ->where('type', 'entertainer')
                 ->first();
@@ -205,13 +186,14 @@ class EventController extends Controller
                 return Helper::jsonResponse(false, 'Selected category is not valid for entertainer', 422);
             }
 
+            $image = $event->image;
             if ($request->hasFile('image')) {
-                // Delete old image
                 if ($event->image) {
-                    Helper::fileDelete($event->image);
+                    $parsedUrl = parse_url($event->image, PHP_URL_PATH);
+                    $oldImagePath = ltrim($parsedUrl, '/');
+                    Helper::fileDelete($oldImagePath);
                 }
-                // Upload new image
-                $image = Helper::fileUpload($request->file('image'), 'Event', time() . '_' . getFileName($request->file('image')));
+                $image = Helper::fileUpload($request->file('image'), 'Event', time() . '_' . $request->file('image')->getClientOriginalName());
             }
 
             $event->update([
@@ -220,10 +202,13 @@ class EventController extends Controller
                 'category_id' => $category->id,
                 'price' => $request->input('price'),
                 'about' => $request->input('about'),
-                'available_date' => $request->input('available_date'),
+                'start_date' => $request->input('start_date'),
+                'ending_date' => $request->input('ending_date'),
                 'available_start_time' => $request->input('available_start_time'),
                 'available_end_time' => $request->input('available_end_time'),
-                'image' => $image,
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
+                'image' => $image, // Now $image is always defined
             ]);
 
             return response()->json([
@@ -235,8 +220,8 @@ class EventController extends Controller
             return response()->json([
                 'success' => false,
                 "message" => "Event not updated",
-                "message" => $e->getMessage()
-            ]);
+                "error" => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -246,7 +231,7 @@ class EventController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->first();
+            $event = Event::where('id', $id,)->where('user_id', Auth::user()->id)->with('bookings')->first();
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -254,8 +239,24 @@ class EventController extends Controller
                 ], 404);
             }
 
+            //check booking
+            $hasBooked = $event->bookings->contains(function ($booking) {
+                return $booking->status === 'booked';
+            });
+
+            if ($hasBooked) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Event cannot be deleted because it has active bookings.',
+                    'warning' => true,
+                ], 403);
+            }
+
+
             if ($event->image) {
-                Helper::fileDelete($event->image);
+                $parsedUrl = parse_url($event->image, PHP_URL_PATH);
+                $oldImagePath = ltrim($parsedUrl, '/');
+                Helper::fileDelete($oldImagePath);
             }
 
             $event->delete();
@@ -269,6 +270,203 @@ class EventController extends Controller
                 'message' => 'Failed to delete event',
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+
+    public function SubCategory(Request $request)
+    {
+        try {
+            $category = Category::where('type', 'entertainer')->get();
+            return response()->json([
+                "success" => true,
+                "message" => "Sub-category List successfully",
+                "category" => $category
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function SubCategoryCreate(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240'
+            ]);
+
+            $validatedData['type'] = 'entertainer';
+
+            if ($request->hasFile('image')) {
+                $validatedData['image'] = Helper::fileUpload($request->file('image'), 'category', time() . '_' . getFileName($request->file('image')));
+            }
+            $category = Category::create($validatedData);
+
+            return response()->json([
+                "success" => true,
+                "message" => "Sub-category created successfully",
+                "category" => $category
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                "failed" => false,
+                $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    //show entertainer category(2 items) wish and id pass show all category  
+    public function entertainer(Request $request)
+    {
+        try {
+            $searchName  = $request->search;
+            $categoryIds = $request->category_id;
+
+            if ($categoryIds) {
+                $categoryIds = is_array($categoryIds) ? $categoryIds : explode(',', $categoryIds);
+            }
+
+            $query = Event::query()->with(['user:id,name', 'category:id,name']);
+
+            if ($searchName) {
+                $query->where(function ($q) use ($searchName) {
+                    $q->where('name', 'like', "%{$searchName}%")
+                        ->orWhereHas('category', function ($q2) use ($searchName) {
+                            $q2->where('name', 'like', "%{$searchName}%");
+                        });
+                });
+            }
+
+
+            if (!empty($categoryIds)) {
+                $query->whereIn('category_id', $categoryIds);
+            }
+
+            $events = $query->get()->makeHidden(['created_at', 'updated_at', 'status']);
+
+            if ($events->isEmpty()) {
+                return Helper::jsonResponse(true, 'No events found.', 200);
+            }
+            $groupedEvents = $events->groupBy(function ($item) {
+                return $item->category->name ?? ' Category';
+            });
+
+            return Helper::jsonResponse(true, 'Event data grouped by category.', 200, $groupedEvents);
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Failed to retrieve event data.', 403, [$e->getMessage()]);
+        }
+    }
+
+
+    //entertainer Category Details show
+    public function entertainerCategoryDetails($id)
+    {
+        try {
+            $Completed = Booking::where('status', 'completed')
+                ->where('event_id', $id)
+                ->count();
+
+            $event = Event::where('status', 'active')
+                ->with('rating')
+                ->find($id);
+
+            if (!$event) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "event not found or inactive"
+                ], 404);
+            }
+
+            $start = Carbon::parse($event->available_start_time);
+            $end = Carbon::parse($event->available_end_time);
+            $hours = (int)ceil(abs($start->floatDiffInHours($end)));
+
+            $platform_rate = $hours * $event->price;
+
+            $dateRange = [];
+            if ($event->start_date && $event->ending_date) {
+                $startDate = Carbon::parse($event->start_date);
+                $endDate = Carbon::parse($event->ending_date);
+
+                $bookedDates = Booking::where('event_id', $event->id)
+                    ->pluck('booking_date')
+                    ->map(fn($date) => Carbon::parse($date)->toDateString())
+                    ->toArray();
+
+                while ($startDate->lte($endDate)) {
+                    $currentDate = $startDate->toDateString();
+                    if ($currentDate >= Carbon::today()->toDateString() && !in_array($currentDate, $bookedDates)) {
+                        $dateRange[] = $currentDate;
+                    }
+
+                    $startDate->addDay();
+                }
+            }
+            $dateRange = !empty($dateRange) ? $dateRange : ['No Booking'];
+
+            return response()->json([
+                "success" => true,
+                "message" => "event details retrieved successfully",
+                "Completed" => $Completed,
+                "platform_rate" => $platform_rate,
+                "event" => $event,
+                "Date_range" => $dateRange
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                "success" => false,
+                "message" => "Error retrieving event details",
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function CustomerOffer(Request $request)
+    {
+        try {
+            $request->validate([
+                'booking_id'          => 'required|exists:bookings,id',
+                'booking_date'        => 'required|date',
+                'booking_start_time'  => 'required|date_format:H:i',
+                'booking_end_time'    => 'required|date_format:H:i|after:booking_start_time',
+                'platform_rate'       => 'required|numeric',
+                'location'            => 'required|string|max:255',
+            ]);
+
+            $booking = Booking::with('event')->findOrFail($request->booking_id);
+            if ($booking->event->user_id !== Auth::user()->id) {
+                return Helper::jsonResponse(false, 'You are not authorized to update this booking.', 403);
+            }
+
+            $booking->update([
+                'booking_date'       => $request->booking_date,
+                'booking_start_time' => $request->booking_start_time,
+                'booking_end_time'   => $request->booking_end_time,
+                'platform_rate'      => $request->platform_rate,
+                'location'           => $request->location,
+            ]);
+
+            return Helper::jsonResponse(true, 'Booking updated successfully', 200, $booking);
+        } catch (\Exception $e) {
+            return Helper::jsonResponse(false, 'Error: ' . $e->getMessage(), 500);
+        }
+    }
+
+
+    public function StatusCustom(Request $request, $id)
+    {
+        try {
+            $booking = Booking::select('id', 'platform_rate', 'name', 'status', 'location', 'booking_date', 'booking_start_time', 'booking_end_time', 'platform_rate', 'created_at',)->findOrFail($id);
+
+            $booking->status = 'booked';
+            $booking->save();
+            return Helper::jsonResponse(true, 'Booking updated successfully', 200, $booking);
+        } catch (\Exception $e) {
+            return Helper::jsonErrorResponse('Message fetching failed', 403, [$e->getMessage()]);
         }
     }
 }

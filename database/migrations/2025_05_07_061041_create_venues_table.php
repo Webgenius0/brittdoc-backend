@@ -14,19 +14,21 @@ return new class extends Migration
         Schema::create('venues', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('name');
+            $table->string('name')->nullable();;
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->text('description');
-            $table->string('location');
-            $table->integer('capacity');
-            $table->decimal('price', 10, 2);
-            $table->date('available_date');
-            $table->time('available_start_time');
-            $table->time('available_end_time');
+            $table->text('description')->nullable();
+            $table->string('location')->nullable();
+            $table->integer('capacity')->nullable();
+            $table->decimal('price', 10, 2)->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('ending_date')->nullable();
+            $table->time('available_start_time')->nullable();
+            $table->time('available_end_time')->nullable();
             $table->json('image')->nullable();
             //latitude and longitude
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }

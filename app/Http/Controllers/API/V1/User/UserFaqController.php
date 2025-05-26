@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API\V1\User;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Models\Faq;
 use App\Services\API\V1\User\Faqs\UserFaqService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use Log;
 use Pest\Console\Help;
 
@@ -22,13 +24,17 @@ class UserFaqController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function list(Request $request)
     {
         try {
-            $faqs = $this->userFaqService->index($request);
-            return Helper::jsonResponse(true, 'Faqs fetched successfully', 200, $faqs, true);
+            $faq = Faq::all();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'FAQs fetched successfully',
+                'data' => $faq,
+            ]);
         } catch (Exception $e) {
-            Log::error("UserFaqController::index" . $e->getMessage());
             return Helper::jsonErrorResponse('Failed to fetch faqs', 500);
         }
     }

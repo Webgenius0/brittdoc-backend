@@ -38,7 +38,7 @@ class UserController extends Controller
             'name' => 'required|string|max:100',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'cover_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
-            'phone' => 'nullable|unique:users,phone,' . auth()->user()->id . '|numeric|max_digits:20',
+            'phone' => 'nullable|unique:users,phone,' . Auth::user()->id . '|numeric|max_digits:20',
             'password' => 'nullable|string|min:6|confirmed',
         ]);
         try {
