@@ -2,17 +2,25 @@
 
 namespace App\Http\Controllers\API\Message;
 
+use App\Events\MessageEvent;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Message;
 use App\Models\RestrictedWord;
+use App\Models\User;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
+    protected $user;
+    public function __construct()
+    {
+        $this->user = Auth::user();
+    }
 
     //restiction  word  check
     protected function checkRestrictedWords($content)
@@ -41,21 +49,28 @@ class MessageController extends Controller
             if ($restrictedWord) {
                 return Helper::jsonErrorResponse('Restricted Word "' . $restrictedWord . '"not use', 422);
             }
-
-            $conversion_id = Auth::id() < $request->receiver_id
-                ? Auth::id() . '-' . $request->receiver_id . '-' . $request->booking_id
-                : $request->receiver_id . '-' . Auth::id() . '-' . $request->booking_id;
+            $recever = User::find($request->receiver_id);
+            if (!$recever) {
+                return Helper::jsonErrorResponse('Receiver not found', 404);
+            }
+            if ($this->user->role === $recever->role) {
+                return Helper::jsonErrorResponse('You can not send message to same role user', 403);
+            }
+            $conversion_id = $this->user->id < $request->receiver_idL
+                ? $this->user->id . '-' . $request->receiver_id . '-' . $request->booking_id
+                : $request->receiver_id . '-' . $this->user->id . '-' . $request->booking_id;
 
             $message = Message::create([
-                'sender_id' => Auth::user()->id,
+                'sender_id' => $this->user->id,
                 'receiver_id' => $request->input('receiver_id'),
                 'booking_id' => $request->input('booking_id'),
                 'conversion_id' => $conversion_id,
                 'content' => $request->input('content'),
             ]);
-
+            // Broadcast the message
+            broadcast(new MessageEvent($message))->toOthers();
             return Helper::jsonResponse(true, 'Sending Message successfully', 201, $message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return Helper::jsonErrorResponse('NOt Sending Message !', 403, [$e->getMessage()]);
         }
     }
@@ -64,7 +79,7 @@ class MessageController extends Controller
     public function getMessage(Request $request)
     {
         try {
-            $receiver_id = Auth::user()->id;
+            $receiver_id = $this->user->id;
             $messages = Message::with([
                 'sender:id,name,avatar,email',
                 'booking:id,event_id,name,location,booking_date,booking_start_time,booking_end_time,platform_rate,created_at',
@@ -72,6 +87,7 @@ class MessageController extends Controller
                 'rating:id,name,rating',
             ])
                 ->where('receiver_id', $receiver_id)
+                ->orWhere('sender_id', $receiver_id)
                 ->orderBy('created_at', 'asc')
                 ->get();
 
@@ -83,7 +99,7 @@ class MessageController extends Controller
                 ->update(['is_read' => true]);
 
             $firstMessage = $messages->first();
-            $sender = $firstMessage->sender;
+            // $sender = $firstMessage->sender;
             $booking = $firstMessage->booking;
             $rating = $firstMessage->rating;
 
@@ -93,13 +109,19 @@ class MessageController extends Controller
                     'content' => $message->content,
                     'is_read' => $message->is_read,
                     'created_at' => $message->created_at,
+                    'sender' => [
+                        'id' => $message->sender->id,
+                        'name' => $message->sender->name,
+                        'avatar' => $message->sender->avatar,
+                        'email' => $message->sender->email,
+                    ],
                 ];
             });
 
             return Helper::jsonResponse(true, 'Messages fetched successfully.', 200, [
-                'sender' => $sender,
+                // 'sender' => $sender,
                 'booking' => $booking,
-                'rating' => $rating,
+                'rating' => $rating ?? 0,
                 'messages' => $messageList
             ]);
         } catch (Exception $e) {
@@ -111,7 +133,7 @@ class MessageController extends Controller
     //group message 
     public function GroupMessage(Request $request)
     {
-        $userId = Auth::id();
+        $userId = $this->user->id;
 
         $conversionIds = $request->input('conversion_id');
 
@@ -128,24 +150,59 @@ class MessageController extends Controller
     }
 
 
-    //get all list show
-    public function listMessage(Request $request)
+
+    /**
+     * Retrieve all message conversations for the current user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function chatList(Request $request): JsonResponse
     {
         try {
-            $conversations = Message::where('sender_id', Auth::user()->id)
-                ->orWhere('receiver_id', Auth::user()->id)
-                ->with(['sender', 'receiver'])
-                ->latest()
-                ->get()
-                ->map(function ($message) {
-                    return Auth::user()->id === $message->sender_id ? $message->receiver : $message->sender;
-                })
-                ->unique('id')
-                ->values();
+            $userId = $this->user->id;
 
-            return Helper::jsonResponse(true, 'all Message list show successfully', 200, $conversations);
+            // Get all messages involving the user
+            $messages = Message::where('sender_id', $userId)
+                ->orWhere('receiver_id', $userId)
+                ->with(['sender', 'receiver'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Group messages by conversation
+            $grouped = $messages->groupBy('conversion_id');
+            $conversations = $grouped->map(function ($group) use ($userId) {
+                $lastMessage = $group->sortByDesc('created_at')->first();
+
+                $opponent = $lastMessage->sender_id === $userId
+                    ? $lastMessage->receiver
+                    : $lastMessage->sender;
+
+                $unreadCount = $group->where('receiver_id', $userId)
+                    ->where('is_read', false)
+                    ->count();
+
+                return [
+                    'conversion_id' => $lastMessage->conversion_id,
+                    'user' => [
+                        'id' => $opponent->id,
+                        'name' => $opponent->name,
+                        'avatar' => $opponent->avatar,
+                    ],
+                    'unread_count' => $unreadCount,
+                    'is_read' => $lastMessage->is_read ?? false,
+                    'last_message' => [
+                        'content' => $lastMessage->content,
+                        'created_at' => $lastMessage->created_at->format('Y-m-d g:i:s A') ?? '',
+                    ],
+
+                ];
+            })->values();
+
+            return Helper::jsonResponse(true, 'All message conversations retrieved successfully', 200, $conversations);
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse('Failed list show', 403, [$e->getMessage()]);
+            return Helper::jsonErrorResponse('Failed to list messages', 403, [$e->getMessage()]);
         }
     }
+
 }
