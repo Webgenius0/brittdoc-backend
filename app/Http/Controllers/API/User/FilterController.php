@@ -116,7 +116,7 @@ class FilterController extends Controller
             });
             $venues = $query->get();
             if ($venues->isEmpty()) {
-                return Helper::jsonResponse(false, 'No matching venues found.', 404, []);
+                return Helper::jsonResponse(false, 'No matching venues found.', 200, []);
             }
 
             return Helper::jsonResponse(true, 'Venues filtered successfully', 200, $venues);

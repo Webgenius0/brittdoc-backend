@@ -98,7 +98,9 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('/entertainer/show/category-wise', [EventController::class, "entertainer"]);
     Route::get('/entertainer/category/details/{id}', [EventController::class, "entertainerCategoryDetails"]);
     Route::post('/user/Enterianer/booking/{id}', [BookingController::class, "BookingEntertainer"]);
-    Route::get('/user/event/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming1"]);
+    // Route::get('/user/event/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming1"]);
+    Route::get('/user/all/booking', [BookingController::class, "allBookingList"]);
+    Route::get('/user/single/booking/details/{id}', [BookingController::class, "BookingDetials"]);
 
     // fillter user section/homePage/event/show
     Route::get('/filter/entertainer', [FilterController::class, 'filterEntertainer']);

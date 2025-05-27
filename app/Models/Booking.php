@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Yajra\DataTables\Html\Editor\Fields\Hidden;
 
 class Booking extends Model
 {
     protected $guarded = ['id'];
 
+    protected  $hidden = [
+        'category',
+    ];
 
     public function user()
     {

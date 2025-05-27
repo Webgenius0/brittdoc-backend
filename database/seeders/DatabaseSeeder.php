@@ -49,5 +49,13 @@ class DatabaseSeeder extends Seeder
         $this->call(SystemSettingSeeder::class);
         $this->call(FaqSeeder::class);
         $this->call(RestrictedWordsTableSeeder::class);
+        $this->call(CategorySeeder::class);
+        $this->call(EventSeeder::class);
+        $this->call(VenueSeeder::class);
+        $this->call(BookingSeeder::class);
+
+
+
+
     }
 }

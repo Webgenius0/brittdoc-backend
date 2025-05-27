@@ -112,4 +112,111 @@ class BookingController extends Controller
             $e->getMessage();
         }
     }
+
+
+    //user section booking list
+    public function allBookingList(Request $request)
+    {
+        try {
+            $status = $request->query('status', '');
+            $userId = Auth::id();
+
+            if (!$userId) {
+                return Helper::jsonResponse(false, 'User not authenticated.', 401);
+            }
+
+            $query = Booking::where('user_id', $userId)
+                ->with(['user:id,name,avatar', 'event', 'event.category:id,name,image', 'venue', 'venue.category:id,name,image']);
+
+            if (!empty($status)) {
+                $query->where('status', $status);
+            }
+
+            $bookings = $query->get();
+
+            return Helper::jsonResponse(true, 'Booking list retrieved successfully.', 200, $bookings);
+        } catch (Exception $e) {
+            Log::error('Error retrieving booking list: ' . $e->getMessage());
+            return Helper::jsonResponse(false, 'Failed to retrieve booking list.', 500, $e->getMessage());
+        }
+    }
+
+
+
+
+    //apply time helper function 
+    private function applyTimeStatus($booking)
+    {
+        $now = Carbon::now();
+        $start = Carbon::parse($booking->booking_date . ' ' . date('H:i:s', strtotime($booking->booking_start_time)));
+        $end = Carbon::parse($booking->booking_date . ' ' . date('H:i:s', strtotime($booking->booking_end_time)));
+
+        $booking->is_critical = false;
+        $booking->is_expired = false;
+        $booking->is_running = false;
+
+        if ($now->lt($start)) {
+            $diffInMinutes = $now->diffInMinutes($start);
+            $formattedTime = Carbon::createFromTime(0, 0, 0)->addMinutes($diffInMinutes)->format('D H:i:s');
+
+            if ($diffInMinutes <= 10) {
+                $booking->is_critical = true;
+            }
+
+            $booking->booking_status = "{$formattedTime} Left To Start";
+        } elseif ($now->between($start, $end)) {
+            $diffInMinutes = $now->diffInMinutes($end);
+
+            $formattedTime = Carbon::createFromTime(0, 0, 0)->addMinutes($diffInMinutes)->format('D H:i:s');
+
+            $booking->is_running = true;
+
+            if ($diffInMinutes <= 10) {
+                $booking->is_critical = true;
+            }
+            $booking->booking_status = "{$formattedTime} Left To End";
+        } else {
+            $booking->is_expired = true;
+            $booking->booking_status = "Time Ended and Completed";
+        }
+
+        return $booking;
+    }
+
+
+
+    //user section single booking details
+    public function BookingDetials($id)
+    {
+        try {
+            $BookedDetails = Booking::with([
+                'event' => function ($q) {
+                    $q->select('id', 'category_id', 'name', 'image', 'about', 'start_date', 'ending_date')
+                        ->with('category:id,name,image,created_at');
+                },
+                'venue' => function ($q) {
+                    $q->select('id', 'category_id', 'name', 'location', 'price', 'description', 'start_date', 'ending_date', 'image')
+                        ->with('category:id,name,image,created_at');
+                },
+                'user:id,name,avatar',
+                'rating'
+            ])
+                ->where('id', $id)
+                ->first();
+
+            if (!$BookedDetails) {
+                return Helper::jsonErrorResponse('Event/Venue Booked Details Retrived Failed', 403);
+            }
+
+            $startTime = Carbon::parse($BookedDetails->booking_start_time);
+            $endTime = Carbon::parse($BookedDetails->booking_end_time);
+            $hours = $startTime->diffInHours($endTime);
+
+            $statusCheck = $this->applyTimeStatus($BookedDetails);
+
+            return Helper::jsonResponse(true, 'Event/Venue Booked Details Successful', 200, $BookedDetails);
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Event/Venue Booked Details Retrived Failed', 403, [$e->getMessage()]);
+        }
+    }
 }
