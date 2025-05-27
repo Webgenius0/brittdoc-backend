@@ -11,7 +11,7 @@ class BookingSeeder extends Seeder
     {
         $bookings = [
             [
-                'user_id' => 1,
+                'user_id' => 2,
                 'event_id' => 1,
                 'venue_id' => null,
                 'location' => 'Central Park',
@@ -47,7 +47,7 @@ class BookingSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 3,
+                'user_id' => 2,
                 'event_id' => 3,
                 'venue_id' => null,
                 'location' => 'Downtown Theater',
@@ -65,7 +65,7 @@ class BookingSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 1,
+                'user_id' => 2,
                 'event_id' => null,
                 'venue_id' => 2,
                 'location' => '456 Market St, Cityville',
@@ -101,7 +101,7 @@ class BookingSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 3,
+                'user_id' => 2,
                 'event_id' => null,
                 'venue_id' => 3,
                 'location' => '789 Garden Ave, Cityville',
@@ -119,7 +119,7 @@ class BookingSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 1,
+                'user_id' => 2,
                 'event_id' => 2,
                 'venue_id' => null,
                 'location' => 'Grand Convention Center',
@@ -155,7 +155,7 @@ class BookingSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 3,
+                'user_id' => 2,
                 'event_id' => null,
                 'venue_id' => 5,
                 'location' => '202 Skyline Blvd, Cityville',

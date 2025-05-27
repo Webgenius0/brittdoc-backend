@@ -13,7 +13,7 @@ class EventSeeder extends Seeder
         // Sample events data
         $events = [
             [
-                'user_id' => 1,
+                'user_id' => 3,
                 'name' => 'Summer Music Festival',
                 'location' => 'Central Park',
                 'category_id' => 1, // assuming Music category from your categories
@@ -31,7 +31,7 @@ class EventSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 2,
+                'user_id' => 3,
                 'name' => 'Business Conference 2025',
                 'location' => 'Grand Convention Center',
                 'category_id' => 2, // Conference Room category
@@ -67,7 +67,7 @@ class EventSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 1,
+                'user_id' => 3,
                 'name' => 'Photography Workshop',
                 'location' => 'Art Studio',
                 'category_id' => 4, // Photography category
@@ -85,7 +85,7 @@ class EventSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 2,
+                'user_id' => 3,
                 'name' => 'Dance Gala',
                 'location' => 'City Hall Auditorium',
                 'category_id' => 2, // Dance category

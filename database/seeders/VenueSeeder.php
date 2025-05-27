@@ -11,7 +11,7 @@ class VenueSeeder extends Seeder
     {
         $venues = [
             [
-                'user_id' => 1,
+                'user_id' => 4,
                 'name' => 'Grand Ballroom',
                 'category_id' => 5, // Banquet Hall category (venue_holder)
                 'description' => 'Spacious ballroom suitable for weddings and large events.',
@@ -30,7 +30,7 @@ class VenueSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 2,
+                'user_id' => 4,
                 'name' => 'Downtown Conference Center',
                 'category_id' => 6, 
                 'description' => 'Modern conference center with multiple meeting rooms.',
@@ -49,7 +49,7 @@ class VenueSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 3,
+                'user_id' => 4,
                 'name' => 'Open Air Garden',
                 'category_id' => 7, 
                 'description' => 'Beautiful garden venue perfect for outdoor ceremonies.',
@@ -68,7 +68,7 @@ class VenueSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 1,
+                'user_id' => 4,
                 'name' => 'City Hall Auditorium',
                 'category_id' => 5, 
                 'description' => 'Large auditorium suitable for performances and conferences.',
@@ -87,7 +87,7 @@ class VenueSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 2,
+                'user_id' => 4,
                 'name' => 'Rooftop Terrace',
                 'category_id' => 7, 
                 'description' => 'Open rooftop venue with stunning city views.',
