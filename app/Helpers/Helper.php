@@ -118,9 +118,12 @@ class Helper
                 $app_logo = 'logo.png';
             }
 
-            $factory = (new Factory)->withServiceAccount(storage_path('app/private/easy-to-manage-firebase-adminsdk-76x4g-a33d9372d7.json'));
+            $factory = (new Factory)->withServiceAccount(storage_path('app/private/brittdoc-a0f85-firebase-adminsdk-fbsvc-d47e6f441a.json'));
 
             $messaging = $factory->createMessaging();
+            // Log::info('Sending to token: ' . json_encode($messaging));
+            // ✅ Correct logging
+            Log::info('Sending to token: ' . $token);
             $notification = Notification::create(
                 $notifyData['title'],
                 Str::limit($notifyData['body'], 100),
