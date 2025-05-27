@@ -391,4 +391,51 @@ class VenueController extends Controller
             ], 500);
         }
     }
+
+    // Venue customer offer update
+    public function CustomerOffer(Request $request)
+    {
+        try {
+            $request->validate([
+                'booking_id'          => 'required|exists:bookings,id',
+                'booking_date'        => 'required|date',
+                'booking_start_time'  => 'required|date_format:H:i',
+                'booking_end_time'    => 'required|date_format:H:i|after:booking_start_time',
+                'platform_rate'       => 'required|numeric',
+                'location'            => 'required|string|max:255',
+            ]);
+
+            $booking = Booking::with('venue')->findOrFail($request->booking_id);
+            if ($booking->venue->user_id !== Auth::user()->id) {
+                return Helper::jsonResponse(false, 'You are not authorized to update this booking.', 403);
+            }
+
+            $booking->update([
+                'booking_date'       => $request->booking_date,
+                'booking_start_time' => $request->booking_start_time,
+                'booking_end_time'   => $request->booking_end_time,
+                'platform_rate'      => $request->platform_rate,
+                'capacity'      => $request->capacity,
+                'location'           => $request->location,
+            ]);
+
+            return Helper::jsonResponse(true, 'Booking updated successfully', 200, $booking);
+        } catch (\Exception $e) {
+            return Helper::jsonResponse(false, 'Error: ' . $e->getMessage(), 500);
+        }
+    }
+
+
+    public function StatusCustom(Request $request, $id)
+    {
+        try {
+            $booking = Booking::with('user')->select('id', 'platform_rate', 'user_id', 'name', 'status', 'location', 'booking_date', 'booking_start_time', 'booking_end_time', 'platform_rate', 'created_at',)->findOrFail($id);
+
+            $booking->status = 'booked';
+            $booking->save();
+            return Helper::jsonResponse(true, 'Booking updated successfully', 200, $booking);
+        } catch (\Exception $e) {
+            return Helper::jsonErrorResponse('Message fetching failed', 403, [$e->getMessage()]);
+        }
+    }
 }

@@ -460,7 +460,7 @@ class EventController extends Controller
     public function StatusCustom(Request $request, $id)
     {
         try {
-            $booking = Booking::select('id', 'platform_rate', 'name', 'status', 'location', 'booking_date', 'booking_start_time', 'booking_end_time', 'platform_rate', 'created_at',)->findOrFail($id);
+            $booking = Booking::with('user')->select('id','user_id', 'platform_rate', 'name', 'status', 'location', 'booking_date', 'booking_start_time', 'booking_end_time', 'platform_rate', 'created_at',)->findOrFail($id);
 
             $booking->status = 'booked';
             $booking->save();

@@ -43,8 +43,7 @@ Route::group(['middleware' => 'guest:api'], function ($router) {
     //forgot password
     Route::post('/forget-password', [ResetPasswordController::class, 'forgotPassword']);
     Route::post('/verify-otp', [ResetPasswordController::class, 'VerifyOTP']);
-    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);
-    ;
+    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);;
 });
 
 Route::group(['middleware' => 'auth:api'], function ($router) {
@@ -163,6 +162,9 @@ Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function (
     Route::get('/booking/venue/details/{id}', [VenueBookingController::class, "VenueBookingDetials"]);
     Route::get('/completed/venue/details/{id}', [VenueBookingController::class, "venueCompletedDetails"]);
     Route::get('/venue/inprogress/upcomming', [UserBookingController::class, "InprogressUpcomming"]);
+    //custom offer 
+    Route::post('/venue/customer/offer', [VenueController::class, "CustomerOffer"]);
+    Route::get('/venue/customer/booked/{id}', [VenueController::class, "StatusCustom"]);
 });
 
 
