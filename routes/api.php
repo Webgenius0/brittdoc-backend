@@ -165,6 +165,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function (
     //custom offer 
     Route::post('/venue/customer/offer', [VenueController::class, "CustomerOffer"]);
     Route::get('/venue/customer/booked/{id}', [VenueController::class, "StatusCustom"]);
+
 });
 
 
