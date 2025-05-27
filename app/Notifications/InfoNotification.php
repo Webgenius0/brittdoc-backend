@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Support\Facades\Log;
 
 class InfoNotification extends Notification
 {
@@ -30,21 +31,7 @@ class InfoNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        // return ['mail'];
-        return ['database', 'broadcast', 'mail'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable)
-    {
-        return (new InfoMailWithQrCode(
-            $this->requestData['user'],
-            $this->requestData['title'],
-            $this->requestData['message'],
-            $this->requestData['qrCodeImage'],
-        ))->to($notifiable->email);
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -55,7 +42,7 @@ class InfoNotification extends Notification
         return [
             'message' => $this->requestData['message'],
             'url' => $this->requestData['url'],
-            'type' => $this->requestData['type'],
+            'message_type' => $this->requestData['message_type'],
             'thumbnail' => $this->requestData['thumbnail'],
         ];
     }
@@ -65,11 +52,12 @@ class InfoNotification extends Notification
      */
     public function toBroadcast($notifiable)
     {
+        Log::info(' broadcast type' . $this->requestData['message_type']);
         return new BroadcastMessage([
             'title' => $this->requestData['title'],
             'message' => $this->requestData['message'],
             'url' => $this->requestData['url'],
-            'type' => $this->requestData['type'],
+            'message_type' => $this->requestData['message_type'],
             'thumbnail' => $this->requestData['thumbnail'],
         ]);
     }

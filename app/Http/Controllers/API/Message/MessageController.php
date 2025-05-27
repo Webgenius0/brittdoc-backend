@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\API\Message;
 
+use App\Enums\NotificationType;
 use App\Events\MessageEvent;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\FirebaseToken;
 use App\Models\Message;
 use App\Models\RestrictedWord;
 use App\Models\User;
+use App\Notifications\InfoNotification;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class MessageController extends Controller
 {
@@ -69,6 +73,36 @@ class MessageController extends Controller
             ]);
             // Broadcast the message
             broadcast(new MessageEvent($message))->toOthers();
+
+            // Sent notification to receiver
+            $firebaseTokens = FirebaseToken::where('user_id', $message->receiver_id)->whereNotNull('token')->get();
+            if (!empty($firebaseTokens)) {
+
+                $notifyData = [
+                    'title' => 'New Message Received',
+                    'body' => 'There is a new message for you. Check it out!'
+                ];
+                foreach ($firebaseTokens as $tokens) {
+                    if (!empty($tokens->token)) {
+                        $token = $tokens->token; // Pluck tokens into an array
+                        // Send notifications using the token array
+                        Helper::sendNotifyMobile($token, $notifyData);
+                    } else {
+                        Log::warning('No Firebase tokens found for job post creator.');
+                    }
+                }
+            } else {
+                Log::warning('No Firebase tokens found for this user.');
+            }
+            //send notification in app
+            $this->sendNotificationAndMail(
+                $message?->receiver,
+                'You have a new message from ' . $message?->sender?->name,
+                'new_message_received',
+                'New Message Received',
+            );
+
+
             return Helper::jsonResponse(true, 'Sending Message successfully', 201, $message);
         } catch (Exception $e) {
             return Helper::jsonErrorResponse('NOt Sending Message !', 403, [$e->getMessage()]);
@@ -78,6 +112,9 @@ class MessageController extends Controller
     //get message
     public function getMessage(Request $request)
     {
+        $validateData = $request->validate([
+            'conversion_id' => 'required|exists:messages,conversion_id',
+        ]);
         try {
             $receiver_id = $this->user->id;
             $messages = Message::with([
@@ -86,8 +123,7 @@ class MessageController extends Controller
                 'booking.event:id,name,location,image',
                 'rating:id,name,rating',
             ])
-                ->where('receiver_id', $receiver_id)
-                ->orWhere('sender_id', $receiver_id)
+                ->where('conversion_id', $validateData['conversion_id'])
                 ->orderBy('created_at', 'asc')
                 ->get();
 
@@ -160,16 +196,29 @@ class MessageController extends Controller
     public function chatList(Request $request): JsonResponse
     {
         try {
+            $searchByName = $request->input('search_by_name');
             $userId = $this->user->id;
 
-            // Get all messages involving the user
-            $messages = Message::where('sender_id', $userId)
-                ->orWhere('receiver_id', $userId)
-                ->with(['sender', 'receiver'])
+            $messages = Message::where(function ($query) use ($userId) {
+                $query->where('sender_id', $userId)
+                    ->orWhere('receiver_id', $userId);
+            })
+            ->with(['sender', 'receiver'])
+                ->when($searchByName, function ($query) use ($searchByName, $userId) {
+                    $query->where(function ($q) use ($searchByName, $userId) {
+                        $q->whereHas('sender', function ($q1) use ($searchByName, $userId) {
+                            $q1->where('id', '!=', $userId)
+                                ->where('name', 'like', '%' . $searchByName . '%');
+                        })->orWhereHas('receiver', function ($q2) use ($searchByName, $userId) {
+                            $q2->where('id', '!=', $userId)
+                                ->where('name', 'like', '%' . $searchByName . '%');
+                        });
+                    });
+                })
+                
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            // Group messages by conversation
             $grouped = $messages->groupBy('conversion_id');
             $conversations = $grouped->map(function ($group) use ($userId) {
                 $lastMessage = $group->sortByDesc('created_at')->first();
@@ -195,7 +244,6 @@ class MessageController extends Controller
                         'content' => $lastMessage->content,
                         'created_at' => $lastMessage->created_at->format('Y-m-d g:i:s A') ?? '',
                     ],
-
                 ];
             })->values();
 
@@ -205,4 +253,23 @@ class MessageController extends Controller
         }
     }
 
+
+    public function sendNotificationAndMail($user = null, $messages = null, $message_type = null, $subject = null)
+    {
+        Log::info('notification type: ' . ($message_type));
+        if ($user && $message_type) {
+            $notificationData = [
+                'title' => $subject,
+                'message' => $messages,
+                'url' => '',
+                'message_type' => $message_type,
+                'thumbnail' => asset('backend/admin/assets/images/messages_user.png' ?? ''),
+                'user' => $this->user,
+                'subject' => $subject,
+            ];
+            $user->notify(new InfoNotification($notificationData));
+            Log::info('Notification sent to user: ' . $user->name);
+        }
+
+    }
 }

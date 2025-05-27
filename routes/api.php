@@ -19,6 +19,7 @@ use App\Http\Controllers\API\User\FilterController;
 use App\Http\Controllers\API\User\HomeController;
 use App\Http\Controllers\API\User\UserBookingController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
+use App\Http\Controllers\API\V1\Firebase\FirebaseTokenController;
 use App\Http\Controllers\API\V1\User\StripePaymentController;
 use App\Http\Controllers\API\V1\User\UserContactSupportController;
 use App\Http\Controllers\API\V1\User\UserFaqController;
@@ -42,7 +43,8 @@ Route::group(['middleware' => 'guest:api'], function ($router) {
     //forgot password
     Route::post('/forget-password', [ResetPasswordController::class, 'forgotPassword']);
     Route::post('/verify-otp', [ResetPasswordController::class, 'VerifyOTP']);
-    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);;
+    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);
+    ;
 });
 
 Route::group(['middleware' => 'auth:api'], function ($router) {
@@ -204,3 +206,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::post('/event/customer/offer', [EventController::class, "CustomerOffer"]);
     Route::get('/event/customer/booked/{id}', [EventController::class, "StatusCustom"]);
 });
+
+// Firebase Token Module
+Route::post("firebase/token/add", [FirebaseTokenController::class, "store"]);
+Route::post("firebase/token/get", [FirebaseTokenController::class, "getToken"]);
+Route::post("firebase/token/delete", [FirebaseTokenController::class, "deleteToken"]);
