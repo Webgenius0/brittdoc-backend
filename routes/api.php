@@ -19,6 +19,7 @@ use App\Http\Controllers\API\User\FilterController;
 use App\Http\Controllers\API\User\HomeController;
 use App\Http\Controllers\API\User\UserBookingController;
 use App\Http\Controllers\API\V1\CMS\HomePageController;
+use App\Http\Controllers\API\V1\Firebase\FirebaseTokenController;
 use App\Http\Controllers\API\V1\User\StripePaymentController;
 use App\Http\Controllers\API\V1\User\UserContactSupportController;
 use App\Http\Controllers\API\V1\User\UserFaqController;
@@ -42,7 +43,8 @@ Route::group(['middleware' => 'guest:api'], function ($router) {
     //forgot password
     Route::post('/forget-password', [ResetPasswordController::class, 'forgotPassword']);
     Route::post('/verify-otp', [ResetPasswordController::class, 'VerifyOTP']);
-    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);;
+    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);
+    ;
 });
 
 Route::group(['middleware' => 'auth:api'], function ($router) {
@@ -199,10 +201,15 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     //message 
     Route::post('/messages/send', [MessageController::class, 'sendMessage']);
     Route::get('/get/messages', [MessageController::class, 'getMessage']);
-    Route::get('/messages/group', [MessageController::class, 'GroupMessage']);      //convension 2-3-1 sender and reciver only
-    Route::get('/messages/listMessage', [MessageController::class, 'listMessage']); //user id all message show
+    // Route::get('/messages/group', [MessageController::class, 'GroupMessage']);      //convension 2-3-1 sender and reciver only
+    Route::get('/messages/all-chats', [MessageController::class, 'chatList']); //user id all message show
 
     //custom offer 
     Route::post('/event/customer/offer', [EventController::class, "CustomerOffer"]);
     Route::get('/event/customer/booked/{id}', [EventController::class, "StatusCustom"]);
 });
+
+// Firebase Token Module
+Route::post("firebase/token/add", [FirebaseTokenController::class, "store"]);
+Route::post("firebase/token/get", [FirebaseTokenController::class, "getToken"]);
+Route::post("firebase/token/delete", [FirebaseTokenController::class, "deleteToken"]);
