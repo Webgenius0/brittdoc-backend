@@ -63,5 +63,9 @@ class Payment extends Model
     {
         return $this->status === 'success';
     }
-    
+   
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class);
+    }
 }

@@ -63,7 +63,7 @@ class VenueSeeder extends Seeder
 
                 'latitude' => 40.730610,
                 'longitude' => -73.935242,
-                'status' => 'inactive',
+                'status' => 'active',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

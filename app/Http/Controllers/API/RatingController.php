@@ -99,7 +99,7 @@ class RatingController extends Controller
     public function indivisualvenue(Request $request, $id)
     {
         try {
-            $rating = Rating::where('venue_id', $id)->get();
+            $rating = Rating::where('event', $id)->get();
             return response()->json([
                 'message' => 'Venue Rating get successfully.',
                 'rating' => $rating
@@ -107,7 +107,7 @@ class RatingController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 $e->getMessage(),
-            ], 201);
+            ]);
         }
     }
 }

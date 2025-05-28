@@ -80,7 +80,7 @@ class EventSeeder extends Seeder
                 //image null
                 'latitude' => 37.774929,
                 'longitude' => -122.419416,
-                'status' => 'inactive',
+                'status' => 'active',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
