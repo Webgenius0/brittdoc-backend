@@ -17,6 +17,10 @@ class Subscription extends Model
         'status' => 'string',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class); 
+    }
 
     public function planing()
     {
