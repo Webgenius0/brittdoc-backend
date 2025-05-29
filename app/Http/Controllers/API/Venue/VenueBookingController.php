@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Validator;
 
 class VenueBookingController extends Controller
 {
-    //user venue bookig 
+
+    // Venue Booking
     public function BookingVenue(Request $request, $id)
     {
         try {
@@ -25,11 +26,20 @@ class VenueBookingController extends Controller
             ]);
 
             $venue = Venue::find($id);
-
             if (!$venue) {
                 return response()->json(['message' => 'Venue Id Not found.'], 404);
             }
-            //booking date check vaildate
+
+            // Check if venue is already booked on the requested date
+            $existingBooking = Booking::where('venue_id', $id)
+                ->whereDate('booking_date', Carbon::parse($request->booking_date)->toDateString())
+                ->first();
+
+            if ($existingBooking) {
+                return Helper::jsonResponse(false, 'This venue is already booked on this date.', 422);
+            }
+
+            // Validate booking date range
             $startDate = Carbon::parse($venue->start_date)->toDateString();
             $endDate = Carbon::parse($venue->ending_date)->toDateString();
 
@@ -48,31 +58,30 @@ class VenueBookingController extends Controller
                 return Helper::jsonResponse(false, 'Booking Date not Available.', 422, $validator->errors());
             }
 
+            // Time & pricing calculations
             $start = Carbon::parse($venue->available_start_time);
             $end = Carbon::parse($venue->available_end_time);
 
             if ($end->lt($start)) {
                 [$start, $end] = [$end, $start];
             }
+
             $diffInMinutes = $start->diffInMinutes($end);
             $hours = (int) ceil($diffInMinutes / 60);
-            // dd($hours);
 
-            $platform_rate = $hours * 100;    // $100 per hours
+            $platform_rate = $hours * 100; // $100 per hour
             $fee_percentage = 17;
             $fee_amount = ($platform_rate * $fee_percentage) / 100;
             $net_amount = $platform_rate - $fee_amount;
-            // dd($net_amount);
 
-            //user
-            $user = User::find(Auth::user()->id);
+            $user = Auth::user();
             $booking = Booking::create([
-                'user_id' => Auth::user()->id,
+                'user_id' => $user->id,
                 'venue_id' => $venue->id,
-                'category' => $venue->category_id,        //venue table ar category_id
-                'location' => $venue->location,         //event table ar location
-                'name' => $user->name,                  //user table ar name
-                'image' => $user->image,                 //user table ar image
+                'category' => $venue->category_id,
+                'location' => $venue->location,
+                'name' => $user->name,
+                'image' => $user->image,
                 'booking_date' => $request->booking_date,
                 'booking_start_time' => $venue->available_start_time,
                 'booking_end_time' => $venue->available_end_time,
@@ -82,12 +91,13 @@ class VenueBookingController extends Controller
                 'net_amount' => $net_amount,
                 'status' => 'pending'
             ]);
-            // dd($booking);
-            return Helper::jsonResponse(true, 'Venue Booking created successfully.', 200, $booking);
+
+            return Helper::jsonResponse(true, 'Venue booking created successfully.', 200, $booking);
         } catch (Exception $e) {
-            return Helper::jsonResponse(false, ' Venue Booking creation failed.', 500, $e->getMessage());
+            return Helper::jsonResponse(false, 'Venue booking creation failed.', 500, $e->getMessage());
         }
     }
+
 
     //venue home page all count
     public function CountTotal(Request $request)
@@ -108,31 +118,13 @@ class VenueBookingController extends Controller
     }
 
 
-    // //booked and completed  homePage
-    // public function bookingList(Request $request)
-    // {
-    //     try {
-    //         $status = $request->status ?? '';
-    //         $vanueHolderVenueIds = Venue::where('user_id', Auth::user()->id)->get()->pluck('id');
-    //         $allBooking_completed = Booking::whereIn('venue_id',  $vanueHolderVenueIds)
-    //             ->when($status, function ($q, $status) {
-    //                 $q->where('status', $status);
-    //             })
-    //             ->with('rating')
-    //             ->get();
-
-    //         return Helper::jsonResponse(true, 'Venue Booked data fatched Successful', 200, $allBooking_completed);
-    //     } catch (Exception $e) {
-    //         return Helper::jsonErrorResponse('Venue Booked data Retrived Failed', 403, [$e->getMessage()]);
-    //     }
-    // }
-
+    // booking list
     public function bookingList(Request $request)
     {
         try {
             $status = $request->status ?? '';
             $venueHolderVenueIds = Venue::where('user_id', Auth::user()->id)->pluck('id');
-            
+
             $allBookingCompleted = Booking::whereIn('venue_id', $venueHolderVenueIds)
                 ->when($status, function ($q, $status) {
                     $q->where('status', $status);
@@ -140,10 +132,10 @@ class VenueBookingController extends Controller
                 ->with([
                     'rating',
                     'venue' => function ($q) {
-                        $q->select('id', 'name','description', 'location', 'image', 'price');
+                        $q->select('id', 'name', 'description', 'location', 'image', 'price');
                     }
                 ])
-                                ->get();
+                ->get();
 
             return Helper::jsonResponse(true, 'Venue booked data fetched successfully', 200, $allBookingCompleted);
         } catch (Exception $e) {
@@ -157,7 +149,7 @@ class VenueBookingController extends Controller
     {
         try {
             $BookedDetails = Booking::with(['venue' => function ($q) {
-                $q->select('id', 'category_id', 'image','description', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'image', 'description', 'name', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
                 ->where('id', $id)
                 ->with('rating')
@@ -187,7 +179,7 @@ class VenueBookingController extends Controller
     {
         try {
             $completed = Booking::with(['venue' => function ($q) {
-                $q->select('id', 'category_id', 'name', 'description','image', 'start_date', 'ending_date')->with(['category:id,name']);
+                $q->select('id', 'category_id', 'name', 'description', 'image', 'start_date', 'ending_date')->with(['category:id,name']);
             }, 'user:id,name,avatar'])
                 ->where('status', 'completed')
                 ->where('id', $id)
@@ -205,7 +197,6 @@ class VenueBookingController extends Controller
             return Helper::jsonErrorResponse('Venue Completed Details Retrived Failed', 403, [$e->getMessage()]);
         }
     }
-
 
 
     //apply time helper function 
@@ -299,7 +290,7 @@ class VenueBookingController extends Controller
         $now = Carbon::now();
 
         $bookings = Booking::with(['event' => function ($q) {
-            $q->select('id', 'category_id', 'image', 'about','name', 'start_date', 'ending_date')
+            $q->select('id', 'category_id', 'image', 'about', 'name', 'start_date', 'ending_date')
                 ->with('category:id,name');
         }, 'user:id,name,avatar', 'rating'])
             ->where('status', 'booked')

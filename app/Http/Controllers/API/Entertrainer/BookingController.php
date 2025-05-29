@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Validator;
 class BookingController extends Controller
 {
 
-    //user Entertainer  bookig 
+    // Entertainer Booking 
     public function BookingEntertainer(Request $request, $id)
     {
         try {
@@ -27,10 +27,19 @@ class BookingController extends Controller
             ]);
 
             $event = Event::find($id);
-
             if (!$event) {
                 return response()->json(['message' => 'Event Id Not found.'], 404);
             }
+
+            // Check if booking already exists for the same event and date
+            $existingBooking = Booking::where('event_id', $id)
+                ->whereDate('booking_date', Carbon::parse($request->booking_date)->toDateString())
+                ->first();
+
+            if ($existingBooking) {
+                return Helper::jsonResponse(false, 'This event is already booked on this date.', 422);
+            }
+
             //booking date check vaildate
             $startDate = Carbon::parse($event->start_date)->toDateString();
             $endDate = Carbon::parse($event->ending_date)->toDateString();
@@ -56,25 +65,24 @@ class BookingController extends Controller
             if ($end->lt($start)) {
                 [$start, $end] = [$end, $start];
             }
+
             $diffInMinutes = $start->diffInMinutes($end);
             $hours = (int) ceil($diffInMinutes / 60);
-            // dd($hours);
 
-            $platform_rate = $hours * 100;    // $100 per hours
+            $platform_rate = $hours * 100; // $100 per hour
             $fee_percentage = 17;
             $fee_amount = ($platform_rate * $fee_percentage) / 100;
             $net_amount = $platform_rate - $fee_amount;
-            // dd($net_amount);
 
-            //user
-            $user = User::find(Auth::user()->id);
+            $user = Auth::user();
+
             $booking = Booking::create([
-                'user_id' => Auth::user()->id,
+                'user_id' => $user->id,
                 'event_id' => $event->id,
-                'category' => $event->category_id,        //event table ar category_id
-                'location' => $event->location,         //event table ar location
-                'name' => $user->name,                  //user table ar name
-                'image' => $user->image,                 //user table ar image
+                'category' => $event->category_id,
+                'location' => $event->location,
+                'name' => $user->name,
+                'image' => $user->image,
                 'booking_date' => $request->booking_date,
                 'booking_start_time' => $event->available_start_time,
                 'booking_end_time' => $event->available_end_time,
@@ -84,12 +92,13 @@ class BookingController extends Controller
                 'net_amount' => $net_amount,
                 'status' => 'pending'
             ]);
-            // dd($booking);
-            return Helper::jsonResponse(true, 'event Booking created successfully.', 200, $booking);
+
+            return Helper::jsonResponse(true, 'Event booking created successfully.', 200, $booking);
         } catch (Exception $e) {
-            return Helper::jsonResponse(false, ' event Booking creation failed.', 500, $e->getMessage());
+            return Helper::jsonResponse(false, 'Event booking creation failed.', 500, $e->getMessage());
         }
     }
+
 
     public function status(Request $request)
     {
@@ -114,7 +123,6 @@ class BookingController extends Controller
     }
 
 
-    //user section booking list
     public function allBookingList(Request $request)
     {
         try {
@@ -126,20 +134,33 @@ class BookingController extends Controller
             }
 
             $query = Booking::where('user_id', $userId)
-                ->with(['user:id,name,avatar', 'event', 'event.category:id,name,image', 'venue', 'venue.category:id,name,image']);
+                ->with([
+                    'user:id,name,avatar',
+                    'event:id,name,category_id',
+                    'event.category:id,name,image',
+                    'venue:id,name,category_id',
+                    'venue.category:id,name,image',
+                    'rating'
+                ]);
 
+            // filter by status if provided
             if (!empty($status)) {
                 $query->where('status', $status);
             }
-
+            // query execute  bookings 
             $bookings = $query->get();
 
-            return Helper::jsonResponse(true, 'Booking list retrieved successfully.', 200, $bookings);
+            //applyTimeStatus
+            $bookings = $bookings->map(function ($booking) {
+                return $this->applyTimeStatus($booking);
+            });
+            return Helper::jsonResponse(true, 'Booking retrieved successfully.', 200, $bookings);
         } catch (Exception $e) {
             Log::error('Error retrieving booking list: ' . $e->getMessage());
             return Helper::jsonResponse(false, 'Failed to retrieve booking list.', 500, $e->getMessage());
         }
     }
+
 
 
 
@@ -217,6 +238,149 @@ class BookingController extends Controller
             return Helper::jsonResponse(true, 'Event/Venue Booked Details Successful', 200, $BookedDetails);
         } catch (Exception $e) {
             return Helper::jsonErrorResponse('Event/Venue Booked Details Retrived Failed', 403, [$e->getMessage()]);
+        }
+    }
+
+    // user Site customer booking status change
+    public function acceptOrRequest(Request $request, $id)
+    {
+        try {
+            $userId = Auth::user()->id;
+            if (!$userId) {
+                return Helper::jsonErrorResponse('User not authenticated');
+            }
+
+            // Check if the user is the owner of the booking
+            $booking = Booking::where('user_id', $userId)->findOrFail($id);
+            if (!$request->has('status')) {
+                return Helper::jsonResponse(true, 'Booking info fetched successfully', 200, $booking);
+            }
+            if ($booking->status === 'booked') {
+                return Helper::jsonResponse(false, 'Booking already booked', 200, $booking);
+            }
+            if (in_array($request->status, ['accept', 'request'])) {
+                $booking->status = $request->status;
+                $booking->save();
+                return Helper::jsonResponse(true, 'Booking  successfully', 200, $booking);
+            } else {
+                return Helper::jsonErrorResponse('Invalid status', 400);
+            }
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Failed to  booking status', 500, [$e->getMessage()]);
+        }
+    }
+
+    // entertainer Booking Accept or Cancel
+    public function acceptOrCancel(Request $request, $id)
+    {
+        try {
+
+            $userId = Auth::user()->id;
+            $booking = Booking::with('event:id,user_id')->findOrFail($id);
+
+            if ($booking->event->user_id !== $userId) {
+                return Helper::jsonErrorResponse('You are not authorized to access this booking', 403);
+            }
+
+            if (!$request->has('status')) {
+                return Helper::jsonResponse(true, 'Booking info fetched successfully', 200, $booking);
+            }
+
+            if (in_array($request->status, ['accept', 'cancelled'])) {
+                $booking->status = $request->status;
+                $booking->save();
+                return Helper::jsonResponse(true, 'Booking status updated successfully', 200, $booking);
+            } else {
+                return Helper::jsonErrorResponse('Invalid status', 400);
+            }
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Failed to update booking status', 500, [$e->getMessage()]);
+        }
+    }
+
+    // user Site customer booking status change
+    public function withdrawOfferE(Request $request, $id)
+    {
+        try {
+            $userId = Auth::user()->id;
+            $booking = Booking::with('event:id,user_id')->findOrFail($id);
+
+            if ($booking->event->user_id !== $userId) {
+                return Helper::jsonErrorResponse('You are not authorized to access this booking', 403);
+            }
+            // Check if the user is the owner of the booking
+            if (!$request->has('status')) {
+                return Helper::jsonResponse(true, 'Booking info fetched successfully', 200, $booking);
+            }
+            if ($booking->status === 'booked') {
+                return Helper::jsonResponse(false, 'Booking already booked', 200, $booking);
+            }
+            if (in_array($request->status, ['withdraw'])) {
+                $booking->status = $request->status;
+                $booking->save();
+                return Helper::jsonResponse(true, 'Booking  successfully', 200, $booking);
+            } else {
+                return Helper::jsonErrorResponse('Invalid status', 400);
+            }
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Failed to  booking status', 500, [$e->getMessage()]);
+        }
+    }
+
+    // Venue Booking Accept or Cancel
+    public function acceptOrCancelV(Request $request, $id)
+    {
+        try {
+
+            $userId = Auth::user()->id;
+            $booking = Booking::with('venue:id,user_id')->findOrFail($id);
+
+            if ($booking->venue->user_id !== $userId) {
+                return Helper::jsonErrorResponse('You are not authorized to access this booking', 403);
+            }
+
+            if (!$request->has('status')) {
+                return Helper::jsonResponse(true, 'Booking info fetched successfully', 200, $booking);
+            }
+
+            if (in_array($request->status, ['accept', 'cancelled'])) {
+                $booking->status = $request->status;
+                $booking->save();
+                return Helper::jsonResponse(true, 'Booking status updated successfully', 200, $booking);
+            } else {
+                return Helper::jsonErrorResponse('Invalid status', 400);
+            }
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Failed to update booking status', 500, [$e->getMessage()]);
+        }
+    }
+
+    // venue Site  status change
+    public function withdrawOfferV(Request $request, $id)
+    {
+        try {
+            $userId = Auth::user()->id;
+            $booking = Booking::with('venue:id,user_id')->findOrFail($id);
+
+            if ($booking->venue->user_id !== $userId) {
+                return Helper::jsonErrorResponse('You are not authorized to access this booking', 403);
+            }
+            // Check if the user is the owner of the booking
+            if (!$request->has('status')) {
+                return Helper::jsonResponse(true, 'Booking info fetched successfully', 200, $booking);
+            }
+            if ($booking->status === 'booked') {
+                return Helper::jsonResponse(false, 'Booking already booked', 200, $booking);
+            }
+            if (in_array($request->status, ['withdraw'])) {
+                $booking->status = $request->status;
+                $booking->save();
+                return Helper::jsonResponse(true, 'Booking  successfully', 200, $booking);
+            } else {
+                return Helper::jsonErrorResponse('Invalid status', 400);
+            }
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Failed to  booking status', 500, [$e->getMessage()]);
         }
     }
 }

@@ -71,9 +71,9 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //Event
     Route::get('/event/user', [EventController::class, "index"]);
     //homepage Api show 
-    Route::get('/homePage/event/show', [HomeController::class, "index"]);
+    Route::get('/homepage/event-show', [HomeController::class, "index"]);
     Route::get('/homePage/entertainer/show', [HomeController::class, "entertainer"]);
-    Route::get('/homePage/venue/show', [HomeController::class, "venue"]);
+    Route::get('/homepage/venue-show', [HomeController::class, "venue"]);
     Route::get('/home-page/search', [HomeController::class, "searchHomepage"]);
 
     //venue details show 
@@ -87,7 +87,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //user Rating
     Route::get('/user/rating/list', [RatingController::class, "index"]);
     Route::post('/user/venue/event/rating', [RatingController::class, "CreateRating"]);
-    Route::get('/user/indivisual/rating/{id}', [RatingController::class, "indivisualvenue"]); //.......
+    Route::get('/user/indivisual/rating/{id}', [RatingController::class, "indivisualvenue"]);
     //payment 
     Route::post('/payments/{id}', [PaymentController::class, 'store']);         //venue and user both payment     
     Route::get('/payments/{id}', [PaymentController::class, 'AfterPayScreen']);
@@ -96,7 +96,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //event show category wise
     Route::get('/entertainer/show/category-wise', [EventController::class, "entertainer"]);
     Route::get('/entertainer/category/details/{id}', [EventController::class, "entertainerCategoryDetails"]);
-    Route::post('/user/Enterianer/booking/{id}', [BookingController::class, "BookingEntertainer"]);
+    Route::post('/user-booking/entertainer/{id}', [BookingController::class, "BookingEntertainer"]);
     // Route::get('/user/event/inprogress/upcomming', [VenueBookingController::class, "InprogressUpcomming1"]);
     Route::get('/user/all/booking', [BookingController::class, "allBookingList"]);
     Route::get('/user/single/booking/details/{id}', [BookingController::class, "BookingDetials"]);
@@ -110,8 +110,9 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     //location
     Route::get('/Entertainer/filter/location', [FilterController::class, 'locationEntertainer']);
     Route::get('/Venue/filter/location', [FilterController::class, 'locationVenueHolder']);
-    Route::get('/Entertrainers/category', [EventController::class, 'SubCategory']);
+    Route::get('/entertrainers/category', [EventController::class, 'SubCategory']);
     Route::get('/venue_holders/category', [VenueController::class, 'SubCategory']);
+    Route::get("/user/accept-request/new-message/{id}", [BookingController::class, "acceptOrRequest"]);    //-----------------------------------------
 });
 
 
@@ -120,7 +121,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($
     //subscription
     Route::get('/subscription-planning', [SubscriptionController::class, 'monthly']);
     Route::post('/entertainer/subscription-booking', [SubscriptionController::class, 'Subscription']);
-    Route::post('/entertainer/subscription-payment/{id}', [SubscriptionController::class, 'SubscriptionPayment']);  //-----ok
+    Route::post('/entertainer/subscription-payment/{id}', [SubscriptionController::class, 'SubscriptionPayment']);
 
     //Category API
     Route::get('/Entertrainer/category', [EventController::class, 'SubCategory']);
@@ -138,6 +139,9 @@ Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($
     Route::get('/Single/Event/Details/{id}', [BookingDetailsController::class, "EventBookingDetials"]);
     Route::get('/completed/Event/details/{id}', [BookingDetailsController::class, "EventCompletedDetails"]);
     Route::get('/event/inprogress/upcomming', [BookingDetailsController::class, "InprogressUpcommings"]);
+    Route::get("/booking/accept-cancelled/{id}", [BookingController::class, "acceptOrCancel"]);     //------------------------------------
+    Route::get("/custom-booking/withdraw-message/{id}", [BookingController::class, "withdrawOfferE"]);  //--------------------------------------
+
 });
 
 //only for venue holder
@@ -167,6 +171,8 @@ Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function (
     //custom offer 
     Route::post('/venue/customer/offer', [VenueController::class, "CustomerOffer"]);
     Route::get('/venue/customer/booked/{id}', [VenueController::class, "StatusCustom"]);
+    Route::get("/bookings/accept-cancelled/{id}", [BookingController::class, "acceptOrCancelV"]); //------------------------------------
+    Route::get("/custom-bookings/withdraw-message/{id}", [BookingController::class, "withdrawOfferV"]); //--------------------------------------
 
 });
 

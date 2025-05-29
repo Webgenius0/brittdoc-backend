@@ -28,7 +28,7 @@ return new class extends Migration
             $table->decimal('fee_amount', 10, 2)->nullable();
             $table->decimal('net_amount', 10, 2)->nullable();
             $table->string('info')->default('Paid 24h ofter event completion');
-            $table->enum('status', ['pending', 'booked', 'upcoming', 'in-progress', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'booked', 'upcoming', 'in-progress', 'withdraw', 'accept', 'request', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }

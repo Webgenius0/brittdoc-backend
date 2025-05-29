@@ -282,7 +282,7 @@ class EventController extends Controller
                 "success" => true,
                 "message" => "Sub-category List successfully",
                 "category" => $category
-            ], 201);
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 $e->getMessage()
@@ -309,7 +309,7 @@ class EventController extends Controller
                 "success" => true,
                 "message" => "Sub-category created successfully",
                 "category" => $category
-            ], 201);
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 "failed" => false,
