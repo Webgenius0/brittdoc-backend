@@ -54,19 +54,27 @@ class PaymentController extends Controller
         }
     }
 
-
-    // public function AfterPayScreen
+    //uesr section After Pay Screen
     public function AfterPayScreen($id)
     {
         try {
-            $booking = Booking::with('rating')->find($id);
-            $venue = Venue::where('status', 'active')->find($id);
-            if (!$venue) {
+            $booking = Booking::with('rating', 'venue')->find($id);
+
+            if (!$booking) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Booking not found"
+                ]);
+            }
+
+            $venue = $booking->venue;
+            if (!$venue || $venue->status !== 'active') {
                 return response()->json([
                     "success" => false,
                     "message" => "Venue not found or inactive"
                 ]);
             }
+
             // Calculate platform rate
             $start = Carbon::parse($venue->available_start_time);
             $end = Carbon::parse($venue->available_end_time);
@@ -75,24 +83,25 @@ class PaymentController extends Controller
 
             return response()->json([
                 "success" => true,
-                "message" => " successfully",
+                "message" => "After payment screen data retrieved successfully",
                 "platform_rate" => $platform_rate,
                 "name" => $venue->name,
                 "image" => $venue->image,
                 "location" => $venue->location,
                 "booking_start_time" => $booking->booking_start_time,
                 "booking_end_time" => $booking->booking_end_time,
-                "Rating_id" => $booking->rating->id,
-                "Rating" => $booking->rating ? $booking->rating->rating : null,
+                "rating_id" => $booking->rating->id ?? null,
+                "rating" => $booking->rating->rating ?? null,
             ]);
         } catch (Exception $e) {
             return response()->json([
                 "success" => false,
-                "message" => "Error retrieving details",
+                "message" => "Error retrieving after payment screen data",
                 "error" => $e->getMessage()
             ], 500);
         }
     }
+
 
 
     //uesr section After Pay Screen Entertainer

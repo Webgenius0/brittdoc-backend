@@ -119,7 +119,7 @@ class MessageController extends Controller
             $receiver_id = $this->user->id;
             $messages = Message::with([
                 'sender:id,name,avatar,email',
-                'booking:id,event_id,name,location,booking_date,booking_start_time,booking_end_time,platform_rate,created_at',
+                'booking:id,event_id,name,location,booking_date,booking_start_time,booking_end_time,platform_rate,created_at,status',
                 'booking.event:id,name,location,image',
                 'rating:id,name,rating',
             ])
@@ -138,7 +138,7 @@ class MessageController extends Controller
             // $sender = $firstMessage->sender;
             $booking = $firstMessage->booking;
             $rating = $firstMessage->rating;
-
+            $getRecever = Message::where('conversion_id', $validateData['conversion_id'])->first();
             $messageList = $messages->map(function ($message) {
                 return [
                     'id' => $message->id,
@@ -158,7 +158,8 @@ class MessageController extends Controller
                 // 'sender' => $sender,
                 'booking' => $booking,
                 'rating' => $rating ?? 0,
-                'messages' => $messageList
+                'messages' => $messageList,
+                'recever_id' => $getRecever->receiver_id == Auth::user()->id ? $getRecever->sender_id : $getRecever->receiver_id
             ]);
         } catch (Exception $e) {
             return Helper::jsonErrorResponse('Message fetching failed', 403, [$e->getMessage()]);
@@ -203,7 +204,7 @@ class MessageController extends Controller
                 $query->where('sender_id', $userId)
                     ->orWhere('receiver_id', $userId);
             })
-            ->with(['sender', 'receiver'])
+                ->with(['sender', 'receiver'])
                 ->when($searchByName, function ($query) use ($searchByName, $userId) {
                     $query->where(function ($q) use ($searchByName, $userId) {
                         $q->whereHas('sender', function ($q1) use ($searchByName, $userId) {
@@ -215,7 +216,7 @@ class MessageController extends Controller
                         });
                     });
                 })
-                
+
                 ->orderBy('created_at', 'desc')
                 ->get();
 
