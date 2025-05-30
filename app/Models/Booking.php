@@ -9,9 +9,14 @@ class Booking extends Model
 {
     protected $guarded = ['id'];
 
-    protected  $hidden = [
-        'category',
+    // protected  $hidden = [
+    //     'category',
+    // ];
+
+    protected $casts = [
+        'custom_Booking' => 'boolean'
     ];
+
 
     public function user()
     {

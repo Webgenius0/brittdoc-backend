@@ -16,13 +16,12 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('event_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('venue_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('category')->nullable();
             $table->string('location')->nullable();
             $table->string('name')->nullable();
             $table->date('booking_date')->nullable();
             $table->time('booking_start_time')->nullable();
             $table->time('booking_end_time')->nullable();
-            //price
+            $table->boolean('custom_Booking')->default(false);
             $table->decimal('platform_rate', 10, 2)->nullable();
             $table->decimal('fee_percentage', 5, 2)->nullable();
             $table->decimal('fee_amount', 10, 2)->nullable();

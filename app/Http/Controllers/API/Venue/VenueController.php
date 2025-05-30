@@ -409,7 +409,6 @@ class VenueController extends Controller
             if ($booking->venue->user_id !== Auth::user()->id) {
                 return Helper::jsonResponse(false, 'You are not authorized to update this booking.', 403);
             }
-
             $booking->update([
                 'booking_date'       => $request->booking_date,
                 'booking_start_time' => $request->booking_start_time,
@@ -417,6 +416,9 @@ class VenueController extends Controller
                 'platform_rate'      => $request->platform_rate,
                 'capacity'      => $request->capacity,
                 'location'           => $request->location,
+
+                // 'custom_Booking'     => 'YES', 
+                'custom_Booking'     => true, 
             ]);
 
             return Helper::jsonResponse(true, 'Booking updated successfully', 200, $booking);

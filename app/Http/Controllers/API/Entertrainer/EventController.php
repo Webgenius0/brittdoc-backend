@@ -447,9 +447,10 @@ class EventController extends Controller
                 'booking_start_time' => $request->booking_start_time,
                 'booking_end_time'   => $request->booking_end_time,
                 'platform_rate'      => $request->platform_rate,
-                'location'           => $request->location,
+                'location'          => $request->location,
+                // 'custom_Booking'     => 'YES',
+                'custom_Booking'     => true,
             ]);
-
             return Helper::jsonResponse(true, 'Booking updated successfully', 200, $booking);
         } catch (\Exception $e) {
             return Helper::jsonResponse(false, 'Error: ' . $e->getMessage(), 500);
@@ -460,7 +461,7 @@ class EventController extends Controller
     public function StatusCustom(Request $request, $id)
     {
         try {
-            $booking = Booking::with('user')->select('id','user_id', 'platform_rate', 'name', 'status', 'location', 'booking_date', 'booking_start_time', 'booking_end_time', 'platform_rate', 'created_at',)->findOrFail($id);
+            $booking = Booking::with('user')->select('id', 'user_id', 'platform_rate', 'name', 'status', 'location', 'booking_date', 'booking_start_time', 'booking_end_time', 'platform_rate', 'created_at',)->findOrFail($id);
 
             $booking->status = 'booked';
             $booking->save();
