@@ -117,10 +117,18 @@ class MessageController extends Controller
         ]);
         try {
             $receiver_id = $this->user->id;
+            // $messages = Message::with([
+            //     'sender:id,name,avatar,email',
+            //     'booking:id,event_id,name,location,booking_date,booking_start_time,booking_end_time,platform_rate,created_at,status',
+            //     'booking.event:id,name,location,image',
+            //     'rating:id,name,rating',
+            // ])
+
             $messages = Message::with([
                 'sender:id,name,avatar,email',
-                'booking:id,event_id,name,location,booking_date,booking_start_time,booking_end_time,platform_rate,created_at,status',
+                'booking:id,event_id,venue_id,name,location,booking_date,booking_start_time,booking_end_time,platform_rate,created_at,status',
                 'booking.event:id,name,location,image',
+                'booking.venue:id,name,location,image',
                 'rating:id,name,rating',
             ])
                 ->where('conversion_id', $validateData['conversion_id'])
@@ -254,6 +262,29 @@ class MessageController extends Controller
         }
     }
 
+    /**
+     * Retrieve all restricted words.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function RestrictedWords(Request $request)
+    {
+        try {
+            $search = $request->query('search', '');
+            $query = RestrictedWord::query();
+
+            if (!empty($search)) {
+                $query->where('word', 'like', '%' . $search . '%');
+            }
+
+            $restrictedWords = $query->get();
+            return Helper::jsonResponse(true, 'Restricted words retrieved successfully', 200, $restrictedWords);
+        } catch (Exception $e) {
+            return Helper::jsonErrorResponse('Failed to retrieve restricted words', 500, [$e->getMessage()]);
+        }
+    }
+
 
     public function sendNotificationAndMail($user = null, $messages = null, $message_type = null, $subject = null)
     {
@@ -271,6 +302,5 @@ class MessageController extends Controller
             $user->notify(new InfoNotification($notificationData));
             Log::info('Notification sent to user: ' . $user->name);
         }
-
     }
 }
