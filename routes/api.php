@@ -216,7 +216,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_user_or_entertainer_or_venu
     Route::get('/messages/all-chats', [MessageController::class, 'chatList']); //user id all message show
     Route::get('/chats/restricted-words', [MessageController::class, 'RestrictedWords']);
 
-    //custom offer 
+    //custom offer  
     Route::post('/event/customer/offer', [EventController::class, "CustomerOffer"]);
     Route::get('/event/customer/booked/{id}', [EventController::class, "StatusCustom"]);
 });
