@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Message extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['sender_id', 'booking_id', 'conversion_id', 'receiver_id', 'content', 'is_read', 'deleted_at', 'status'];
+    protected $fillable = ['sender_id', 'booking_id', 'conversion_id', 'is_restricted','receiver_id', 'content', 'is_read', 'deleted_at', 'status'];
 
     protected $casts = [
         'sender_id' => 'integer',

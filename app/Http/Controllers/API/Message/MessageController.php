@@ -50,9 +50,9 @@ class MessageController extends Controller
             ]);
 
             $restrictedWord = $this->checkRestrictedWords($request->content);
-            if ($restrictedWord) {
-                return Helper::jsonErrorResponse('Restricted Word "' . $restrictedWord . '"not use', 422);
-            }
+            $isRestricted = $restrictedWord ? 'true' : 'false';
+
+
             $recever = User::find($request->receiver_id);
             if (!$recever) {
                 return Helper::jsonErrorResponse('Receiver not found', 404);
@@ -60,7 +60,7 @@ class MessageController extends Controller
             if ($this->user->role === $recever->role) {
                 return Helper::jsonErrorResponse('You can not send message to same role user', 403);
             }
-            $conversion_id = $this->user->id < $request->receiver_idL
+            $conversion_id = $this->user->id < $request->receiver_id
                 ? $this->user->id . '-' . $request->receiver_id . '-' . $request->booking_id
                 : $request->receiver_id . '-' . $this->user->id . '-' . $request->booking_id;
 
@@ -70,6 +70,7 @@ class MessageController extends Controller
                 'booking_id' => $request->input('booking_id'),
                 'conversion_id' => $conversion_id,
                 'content' => $request->input('content'),
+                'is_restricted' => $isRestricted,
             ]);
             // Broadcast the message
             broadcast(new MessageEvent($message))->toOthers();
@@ -117,12 +118,10 @@ class MessageController extends Controller
         ]);
         try {
             $receiver_id = $this->user->id;
-            // $messages = Message::with([
-            //     'sender:id,name,avatar,email',
-            //     'booking:id,event_id,name,location,booking_date,booking_start_time,booking_end_time,platform_rate,created_at,status',
-            //     'booking.event:id,name,location,image',
-            //     'rating:id,name,rating',
-            // ])
+            $firstMessage = Message::where('conversion_id', $validateData['conversion_id'])->first();
+            if (!$firstMessage) {
+                return Helper::jsonResponse(true, 'No messages found.', 200, []);
+            }
 
             $messages = Message::with([
                 'sender:id,name,avatar,email',
@@ -132,13 +131,26 @@ class MessageController extends Controller
                 'rating:id,name,rating',
             ])
                 ->where('conversion_id', $validateData['conversion_id'])
+                ->where(function ($query) use ($receiver_id) {
+                    $query->where('sender_id', $receiver_id) // sender all message show
+                        ->orWhere(function ($q) use ($receiver_id) {
+                            $q->where('receiver_id', $receiver_id)
+                                ->where('is_restricted', 'false'); // receiver restricted message not show
+                        });
+                })
                 ->orderBy('created_at', 'asc')
                 ->get();
 
             if ($messages->isEmpty()) {
                 return Helper::jsonResponse(true, 'No messages found.', 200, []);
             }
-            Message::where('receiver_id', $receiver_id)
+
+            if ($messages->isEmpty()) {
+                return Helper::jsonResponse(true, 'No messages found.', 200, []);
+            }
+         
+            Message::where('conversion_id', $validateData['conversion_id'])
+                ->where('receiver_id', $receiver_id)
                 ->where('is_read', false)
                 ->update(['is_read' => true]);
 
@@ -168,6 +180,8 @@ class MessageController extends Controller
                 'rating' => $rating ?? 0,
                 'messages' => $messageList,
                 'recever_id' => $getRecever->receiver_id == Auth::user()->id ? $getRecever->sender_id : $getRecever->receiver_id
+
+
             ]);
         } catch (Exception $e) {
             return Helper::jsonErrorResponse('Message fetching failed', 403, [$e->getMessage()]);

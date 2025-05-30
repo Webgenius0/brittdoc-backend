@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('conversion_id');
             $table->text('content');
             $table->boolean('is_read')->default(false);
+            $table->enum('is_restricted', ['true', 'false'])->default('false');
             $table->softDeletes();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();

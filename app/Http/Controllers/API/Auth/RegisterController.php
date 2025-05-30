@@ -66,12 +66,12 @@ class RegisterController extends Controller
                 ]);
                 $user = $existingUser;
             } else {
-                //upload avatar photo
-                if ($request->hasFile('avatar')) {
-                    $avatar = Helper::fileUpload($request->file('avatar'), 'user/avatar', getFileName($request->file('avatar')));
-                } else {
-                    $avatar = 'uploads/avatar/avatar_defult.png';
-                }
+                // //upload avatar photo
+                // if ($request->hasFile('avatar')) {
+                //     $avatar = Helper::fileUpload($request->file('avatar'), 'user/avatar', getFileName($request->file('avatar')));
+                // } else {
+                //     $avatar = 'uploads/avatar/avatar_defult.png';
+                // }
 
                 $userData = [
                     'name' => $request->input('name'),
@@ -81,7 +81,6 @@ class RegisterController extends Controller
                     'role' => $request->input('role'),
                     'otp' => $otp,
                     'otp_expires_at' => $otpExpiresAt,
-                    'avatar' => $avatar,
                 ];
             }
 
