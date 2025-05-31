@@ -153,12 +153,14 @@ class VenueController extends Controller
         }
     }
 
-    //venue update function 
+    // //venue update function 
     public function update(Request $request, string $id)
     {
-        // dd($request->all());
         try {
-            $venue = Venue::where('id', $id,)->where('user_id', Auth::user()->id)->first();
+            $venue = Venue::where('id', $id)
+                ->where('user_id', Auth::user()->id)
+                ->first();
+
             if (!$venue) {
                 return Helper::jsonResponse(false, 'Venue not found', 404);
             }
@@ -172,14 +174,15 @@ class VenueController extends Controller
                 'price' => 'nullable|numeric|min:0',
                 'available_date' => 'nullable|date',
                 'available_start_time' => 'nullable|date_format:H:i',
-                'available_end_time' => 'nullable|date_format:H:i',
+                'available_end_time' => 'nullable|date_format:H:i|after:available_start_time',
                 'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
                 'latitude' => 'nullable',
                 'longitude' => 'nullable',
             ]);
 
-            // check if the category is valid for venue holders
-            $category = Category::where('id', $request->category_id)
+            // Validate category
+            $categoryId = $request->category_id ?? $venue->category_id;
+            $category = Category::where('id', $categoryId)
                 ->where('type', 'venue_holder')
                 ->first();
 
@@ -187,7 +190,21 @@ class VenueController extends Controller
                 return Helper::jsonResponse(false, 'Selected category is not valid for venue holders', 422);
             }
 
-            $uploadedImages = [];
+            $dataToUpdate = [
+                'user_id' => Auth::user()->id,
+                'name' => $request->input('name', $venue->name),
+                'location' => $request->input('location', $venue->location),
+                'category_id' => $category->id,
+                'capacity' => $request->input('capacity', $venue->capacity),
+                'price' => $request->input('price', $venue->price),
+                'description' => $request->input('description', $venue->description),
+                'available_date' => $request->input('available_date', $venue->available_date),
+                'available_start_time' => $request->input('available_start_time', $venue->available_start_time),
+                'available_end_time' => $request->input('available_end_time', $venue->available_end_time),
+                'latitude' => $request->input('latitude', $venue->latitude),
+                'longitude' => $request->input('longitude', $venue->longitude),
+            ];
+
             if ($request->hasFile('image')) {
                 $oldImages = is_array($venue->image) ? $venue->image : json_decode($venue->image ?? '', true);
 
@@ -199,6 +216,7 @@ class VenueController extends Controller
                     }
                 }
 
+                $uploadedImages = [];
                 foreach ($request->file('image') as $image) {
                     $uploadedImages[] = Helper::fileUpload(
                         $image,
@@ -206,31 +224,18 @@ class VenueController extends Controller
                         time() . '_' . $image->getClientOriginalName()
                     );
                 }
+                $dataToUpdate['image'] = $uploadedImages;
             }
 
-
-            $venue->update([
-                'user_id' => Auth::user()->id,
-                'name' => $request->input('name'),
-                'location' => $request->input('location'),
-                'category_id' => $category->id,
-                'capacity' => $request->input('capacity'),
-                'price' => $request->input('price'),
-                'description' => $request->input('description'),
-                'available_date' => $request->input('available_date'),
-                'available_start_time' => $request->input('available_start_time'),
-                'available_end_time' => $request->input('available_end_time'),
-                'latitude' => $request->input('latitude'),
-                'longitude' => $request->input('longitude'),
-                'image' => $uploadedImages, // JSON format for multiple images
-
-            ]);
+            $venue->update($dataToUpdate);
             return Helper::jsonResponse(true, 'Venue updated successfully.', 200, $venue);
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse('Failed to update Venue' . $e->getMessage(), 500);
-            Log::error("VenueController::update" . $e->getMessage());
+            Log::error("VenueController::update - " . $e->getMessage());
+            return Helper::jsonErrorResponse('Failed to update Venue: ' . $e->getMessage(), 500);
         }
     }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -418,7 +423,7 @@ class VenueController extends Controller
                 'location'           => $request->location,
 
                 // 'custom_Booking'     => 'YES', 
-                'custom_Booking'     => true, 
+                'custom_Booking'     => true,
             ]);
 
             return Helper::jsonResponse(true, 'Booking updated successfully', 200, $booking);

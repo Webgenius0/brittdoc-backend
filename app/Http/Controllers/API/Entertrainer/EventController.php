@@ -155,7 +155,10 @@ class EventController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $event = Event::where('id', $id)->where('user_id', Auth::user()->id)->first();
+            $event = Event::where('id', $id)
+                ->where('user_id', Auth::user()->id)
+                ->first();
+
             if (!$event) {
                 return response()->json([
                     'success' => false,
@@ -177,15 +180,16 @@ class EventController extends Controller
                 'latitude' => 'nullable',
                 'longitude' => 'nullable',
             ]);
-            //category type check
+
             $category = Category::where('id', $request->category_id)
                 ->where('type', 'entertainer')
                 ->first();
 
-            if (!$category) {
+            if (!$category && $request->category_id) {
                 return Helper::jsonResponse(false, 'Selected category is not valid for entertainer', 422);
             }
 
+            // handle image
             $image = $event->image;
             if ($request->hasFile('image')) {
                 if ($event->image) {
@@ -196,19 +200,20 @@ class EventController extends Controller
                 $image = Helper::fileUpload($request->file('image'), 'Event', time() . '_' . $request->file('image')->getClientOriginalName());
             }
 
+            // final update - only once
             $event->update([
-                'name' => $request->input('name'),
-                'location' => $request->input('location'),
-                'category_id' => $category->id,
-                'price' => $request->input('price'),
-                'about' => $request->input('about'),
-                'start_date' => $request->input('start_date'),
-                'ending_date' => $request->input('ending_date'),
-                'available_start_time' => $request->input('available_start_time'),
-                'available_end_time' => $request->input('available_end_time'),
-                'latitude' => $request->input('latitude'),
-                'longitude' => $request->input('longitude'),
-                'image' => $image, // Now $image is always defined
+                'name' => $request->input('name', $event->name),
+                'location' => $request->input('location', $event->location),
+                'category_id' => $category ? $category->id : $event->category_id,
+                'price' => $request->input('price', $event->price),
+                'about' => $request->input('about', $event->about),
+                'start_date' => $request->input('start_date', $event->start_date),
+                'ending_date' => $request->input('ending_date', $event->ending_date),
+                'available_start_time' => $request->input('available_start_time', $event->available_start_time),
+                'available_end_time' => $request->input('available_end_time', $event->available_end_time),
+                'latitude' => $request->input('latitude', $event->latitude),
+                'longitude' => $request->input('longitude', $event->longitude),
+                'image' => $image,
             ]);
 
             return response()->json([
@@ -219,8 +224,8 @@ class EventController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                "message" => "Event not updated",
-                "error" => $e->getMessage()
+                'message' => 'Event not updated',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

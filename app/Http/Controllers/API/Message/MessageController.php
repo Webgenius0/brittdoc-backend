@@ -125,7 +125,7 @@ class MessageController extends Controller
 
             $messages = Message::with([
                 'sender:id,name,avatar,email',
-                'booking:id,event_id,venue_id,name,location,booking_date,booking_start_time,booking_end_time,platform_rate,created_at,status',
+                'booking:id,event_id,venue_id,name,location,custom_Booking,booking_date,booking_start_time,booking_end_time,platform_rate,created_at,status',
                 'booking.event:id,name,location,image',
                 'booking.venue:id,name,location,image',
                 'rating:id,name,rating',

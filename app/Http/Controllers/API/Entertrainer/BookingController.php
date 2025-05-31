@@ -276,7 +276,8 @@ class BookingController extends Controller
         try {
 
             $userId = Auth::user()->id;
-            $booking = Booking::with('event:id,user_id')->findOrFail($id);
+            $booking = Booking::with(['event:id,user_id', 'user:id,name,email,avatar'])->findOrFail($id);
+            // $booking = Booking::with('event:id,user_id')->findOrFail($id);
 
             if ($booking->event->user_id !== $userId) {
                 return Helper::jsonErrorResponse('You are not authorized to access this booking', 403);
@@ -318,7 +319,7 @@ class BookingController extends Controller
             if (in_array($request->status, ['withdraw'])) {
                 $booking->status = $request->status;
                 $booking->save();
-                return Helper::jsonResponse(true, 'Booking  successfully', 200, $booking);
+                return Helper::jsonResponse(true, 'Custom Offer withdraw  successfully', 200, $booking);
             } else {
                 return Helper::jsonErrorResponse('Invalid status', 400);
             }
@@ -333,7 +334,8 @@ class BookingController extends Controller
         try {
 
             $userId = Auth::user()->id;
-            $booking = Booking::with('venue:id,user_id')->findOrFail($id);
+            $booking = Booking::with(['venue:id,user_id', 'user:id,name,email,avatar'])->findOrFail($id);
+            // $booking = Booking::with('venue:id,user_id')->findOrFail($id);
 
             if ($booking->venue->user_id !== $userId) {
                 return Helper::jsonErrorResponse('You are not authorized to access this booking', 403);
@@ -375,7 +377,7 @@ class BookingController extends Controller
             if (in_array($request->status, ['withdraw'])) {
                 $booking->status = $request->status;
                 $booking->save();
-                return Helper::jsonResponse(true, 'Booking  successfully', 200, $booking);
+                return Helper::jsonResponse(true, 'Custom Offer withdraw  successfully', 200, $booking);
             } else {
                 return Helper::jsonErrorResponse('Invalid status', 400);
             }
