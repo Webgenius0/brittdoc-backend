@@ -16,12 +16,32 @@ class Rating extends Model
     {
         return $this->belongsTo(Booking::class);
     }
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    //  public function user()
+    // {
+    //    return $this->belongsTo(User::class);
+    // }
 
     protected $casts = [
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id'); //sending user
+    }
+
+    public function receiver()
+    {
+        return $this->belongsTo(User::class, 'reciver_id'); //receiving rating user
+    }
+
+    public function venue()
+    {
+        return $this->belongsTo(Venue::class);
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 }

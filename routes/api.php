@@ -112,7 +112,7 @@ Route::group(['middleware' => ['auth:api', 'check_is_user']], function ($router)
     Route::get('/Venue/filter/location', [FilterController::class, 'locationVenueHolder']);
     Route::get('/entertrainers/category', [EventController::class, 'SubCategory']);
     Route::get('/venue_holders/category', [VenueController::class, 'SubCategory']);
-    Route::get("/user/accept-request/new-message/{id}", [BookingController::class, "acceptOrRequest"]);    //-----------------------------------------
+    Route::get("/user/accept-request/new-message/{id}", [BookingController::class, "acceptOrRequest"]);
 });
 
 
@@ -139,9 +139,12 @@ Route::group(['middleware' => ['auth:api', 'check_is_entertainer']], function ($
     Route::get('/single/event-details/{id}', [BookingDetailsController::class, "EventBookingDetials"]);
     Route::get('/completed/Event/details/{id}', [BookingDetailsController::class, "EventCompletedDetails"]);
     Route::get('/event/inprogress/upcomming', [BookingDetailsController::class, "InprogressUpcommings"]);
-    Route::get("/booking/accept-cancelled/{id}", [BookingController::class, "acceptOrCancel"]);     //------------------------------------
-    Route::get("/custom-booking/withdraw-message/{id}", [BookingController::class, "withdrawOfferE"]);  //--------------------------------------
+    Route::get("/booking/accept-cancelled/{id}", [BookingController::class, "acceptOrCancel"]);
+    Route::get("/custom-booking/withdraw-message/{id}", [BookingController::class, "withdrawOfferE"]);
 
+    //rating entertainer
+    Route::get('/entertainer/rating-list', [RatingController::class, "RatingListEntertaner"]);
+    Route::post('/entertainer/create-rating', [RatingController::class, "CreateRatingE"]);
 });
 
 //only for venue holder
@@ -171,9 +174,11 @@ Route::group(['middleware' => ['auth:api', 'check_is_venue_holder']], function (
     //custom offer 
     Route::post('/venue/customer/offer', [VenueController::class, "CustomerOffer"]);
     Route::get('/venue/customer/booked/{id}', [VenueController::class, "StatusCustom"]);
-    Route::get("/bookings/accept-cancelled/{id}", [BookingController::class, "acceptOrCancelV"]); //------------------------------------
-    Route::get("/custom-bookings/withdraw-message/{id}", [BookingController::class, "withdrawOfferV"]); //--------------------------------------
-
+    Route::get("/bookings/accept-cancelled/{id}", [BookingController::class, "acceptOrCancelV"]);
+    Route::get("/custom-bookings/withdraw-message/{id}", [BookingController::class, "withdrawOfferV"]);
+    //rating venue holder
+    Route::get('/venue/rating-list', [RatingController::class, "RatingListVenueHolder"]);
+    Route::post('/venue/create-rating', [RatingController::class, "CreateRatingV"]);        
 });
 
 

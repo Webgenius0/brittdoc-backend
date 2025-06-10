@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Cashier\Billable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes,Billable;
 
     // Rest omitted for brevity
 
@@ -100,7 +101,7 @@ class User extends Authenticatable implements JWTSubject
     }
     public function subcription()
     {
-        return $this->hasMany(subcription::class);
+        return $this->hasMany(Subscription::class);
     }
 
     /**
