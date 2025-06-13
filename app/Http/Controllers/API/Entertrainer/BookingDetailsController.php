@@ -62,12 +62,17 @@ class BookingDetailsController extends Controller
     public function EventBookingDetials($id)
     {
         try {
+            $userId = Auth::user()->id;
             $BookedDetails = Booking::with(['event' => function ($q) {
                 $q->select('id', 'category_id', 'name', 'image', 'about', 'start_date', 'ending_date')->with('category:id,name,image,created_at');
             }, 'user:id,name,avatar'])
                 ->where('id', $id)
+                ->whereHas('event', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
                 ->with('rating')
                 ->first();
+            $BookedDetails->makeHidden(['venue_id']);
             // dd($BookedDetails->toArray());
             if (!$BookedDetails) {
                 return Helper::jsonErrorResponse('Event Booked Details Retrived Failed', 403);

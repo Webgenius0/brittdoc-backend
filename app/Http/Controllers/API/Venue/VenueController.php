@@ -6,12 +6,17 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Category;
+use App\Models\OffDay;
 use App\Models\Venue;
+use App\Models\Weekday;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class VenueController extends Controller
 {
@@ -443,6 +448,475 @@ class VenueController extends Controller
             return Helper::jsonResponse(true, 'Booking updated successfully', 200, $booking);
         } catch (\Exception $e) {
             return Helper::jsonErrorResponse('Message fetching failed', 403, [$e->getMessage()]);
+        }
+    }
+
+
+    //====================================Client update Venue Holder ========================================
+    //create venue 
+    public function venueCreate(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255|unique:venues,name',
+                'location' => 'required|string|max:255',
+                'category_id' => 'required|exists:categories,id,type,venue_holder',
+                'capacity' => 'required|min:1',
+                'price' => 'required|numeric|min:1',
+                'description' => 'required|string|max:1000',
+                'start_date' => 'required|date|after_or_equal:today',
+                'ending_date' => 'required|date|after_or_equal:start_date',
+                'weekdays' => 'required|array|min:1',
+                'weekdays.*.day' => 'required|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+                'weekdays.*.available_start_time' => 'nullable|date_format:H:i',
+                'weekdays.*.available_end_time' => 'nullable|date_format:H:i|after:weekdays.*.available_start_time',
+                'weekdays.*.is_active' => 'sometimes|boolean',
+                'unavailable_date' => 'nullable|array',
+                'unavailable_date.*' => 'date',
+                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+                'latitude' => 'nullable|numeric',
+                'longitude' => 'nullable|numeric',
+
+            ]);
+
+            $category = Category::where('id', $request->category_id)
+                ->where('type', 'venue_holder')
+                ->first();
+
+            if (!$category) {
+                return helper::jsonResponse(false, 'Selected category is not valid for venue holders', 422);
+            }
+
+            // multiple images upload
+            $uploadedImages = [];
+            if ($request->hasFile('image')) {
+                foreach ($request->file('image') as $image) {
+                    $uploadedImages[] = Helper::fileUpload($image, 'Venue', time() . '_' . $image->getClientOriginalName());
+                }
+            }
+
+            // Create venue
+            $venue = Venue::create([
+                'user_id' => Auth::id(),
+                'name' => $validated['name'],
+                'location' => $validated['location'],
+                'category_id' => $validated['category_id'],
+                'capacity' => $validated['capacity'],
+                'price' => $validated['price'],
+                'description' => $validated['description'],
+                'start_date' => $validated['start_date'],
+                'ending_date' => $validated['ending_date'],
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
+                'image' => $uploadedImages,
+            ]);
+
+            //customize weekdays handling
+            $allWeekdays = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            $defaultSchedule = [
+                'available_start_time' => '09:00',
+                'available_end_time' => '12:00',
+                'is_active' => true,
+            ];
+            $weekdaysData = [];
+            foreach ($allWeekdays as $day) {
+                $weekdaysData[$day] = $defaultSchedule;
+            }
+
+            // Merge with provided data if exists
+            if (!empty($validated['weekdays'])) {
+                foreach ($validated['weekdays'] as $providedDay) {
+                    $dayName = strtolower($providedDay['day']);
+                    if (in_array($dayName, $allWeekdays)) {
+                        $weekdaysData[$dayName] = [
+                            'available_start_time' => $providedDay['available_start_time'] ?? $defaultSchedule['available_start_time'],
+                            'available_end_time' => $providedDay['available_end_time'] ?? $defaultSchedule['available_end_time'],
+                            'is_active' => $providedDay['is_active'] ?? $defaultSchedule['is_active']
+                        ];
+                    }
+                }
+            }
+
+            // Create records for all 7 days
+            foreach ($weekdaysData as $dayName => $schedule) {
+                Weekday::create([
+                    'venue_id' => $venue->id,
+                    'weekday' => $dayName,
+                    'available_start_time' => $schedule['available_start_time'],
+                    'available_end_time' => $schedule['available_end_time'],
+                    'is_active' => $schedule['is_active']
+                ]);
+            }
+            // off days
+            if (!empty($validated['unavailable_date'])) {
+                OffDay::create([
+                    'venue_id' => $venue->id,
+                    'unavailable_date' => $validated['unavailable_date'],
+                ]);
+            }
+
+            $availability = $this->generateAvailabilityPreview(
+                $validated['start_date'],
+                $validated['ending_date'],
+                $weekdaysData,
+                $validated['unavailable_date'] ?? []
+            );
+
+            DB::commit();
+            return Helper::jsonResponse(true, 'venue created successfully', 201, [
+                'venue' => $venue->load('weekdays', 'offDays'),
+                'availability_preview' => $availability
+            ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'failed' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'failed' => false,
+                'message' => 'Server error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Generate availability preview  defult weekday +
+    protected function generateAvailabilityPreview($startDate, $endDate, $weekdaysData, $unavailable_date)
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        $activeDays = collect($weekdaysData)
+            ->filter(fn($day) => $day['is_active'])
+            ->keys()
+            ->toArray();
+
+        $unactiveDays = collect($weekdaysData)
+            ->filter(fn($day) => !$day['is_active'])
+            ->keys()
+            ->toArray();
+
+        $unavailable_date = collect($unavailable_date)
+            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->toArray();
+
+        $availableDates = [];
+        $unavailableDates = [];
+
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+            $formattedDate = $date->format('Y-m-d');
+            $dayName = strtolower($date->format('l'));
+
+            if (in_array($formattedDate, $unavailable_date)) {
+                $unavailableDates[] = $formattedDate;
+                continue;
+            }
+
+            if (in_array($dayName, $activeDays)) {
+                $availableDates[] = $formattedDate;
+            } else {
+                $unavailableDates[] = $formattedDate;
+            }
+        }
+
+        return [
+            'active_weekdays' => $activeDays,
+            'unactive_weekdays' => $unactiveDays,
+            'off_days' => $unavailable_date,
+            'available_dates' => $availableDates,
+            'unavailable_dates' => $unavailableDates,
+        ];
+    }
+
+    //venue details show
+    public function venueDetail($id)
+    {
+        try {
+            $venue = Venue::where('user_id', Auth::user()->id)->with(['weekdays', 'offDays'])->find($id);
+            if (!$venue) {
+                return Helper::jsonResponse(false, 'Venue not found', 404);
+            }
+            // Prepare data for availability preview
+            $weekdays = $venue->weekdays->map(function ($day) {
+                return [
+                    'day' => $day->weekday,
+                    'start_time' => $day->start_time,
+                    'end_time' => $day->end_time,
+                    'is_active' => (bool) $day->is_active,
+                ];
+            })->toArray();
+
+            $offDays = $venue->offDays->pluck('off_date')->toArray();
+
+            // Generate availability preview
+            $availability = $this->generateAvailabilityPreview2(
+                $venue->start_date,
+                $venue->ending_date,
+                $weekdays,
+                $offDays
+            );
+
+            return Helper::jsonResponse(
+                true,
+                'Venue details fetched successfully',
+                200,
+                [
+                    'venue' => $venue,
+                    'availability_preview' => $availability,
+                ]
+            );
+        } catch (ModelNotFoundException $e) {
+            return Helper::jsonResponse(false, 'venue not found', 404);
+        } catch (Exception $e) {
+            return Helper::jsonResponse(
+                false,
+                'Server error:' . $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    //update venue 
+    public function updatevenue(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $validated = $request->validate([
+                'name' => 'nullable|string|max:255',
+                'location' => 'nullable|string|max:255',
+                'category_id' => 'nullable|exists:categories,id,type,venue_holder',
+                'price' => 'nullable|numeric|min:0',
+                'capacity' => 'nullable|min:1',
+                'description' => 'nullable|string|max:1000',
+                'start_date' => 'nullable|date|after_or_equal:today',
+                'ending_date' => 'nullable|date|after_or_equal:start_date',
+                'latitude' => 'nullable|numeric',
+                'longitude' => 'nullable|numeric',
+                'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+                'weekdays' => 'nullable|array',
+                'weekdays.*.day' => 'required_with:weekdays|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+                'weekdays.*.available_start_time' => 'nullable|date_format:H:i',
+                'weekdays.*.available_end_time' => 'nullable|date_format:H:i|after:weekdays.*.available_start_time',
+                'weekdays.*.is_active' => 'sometimes|boolean',
+                'unavailable_date' => 'nullable|array',
+                'unavailable_date.*' => 'date|after_or_equal:start_date|before_or_equal:ending_date',
+            ]);
+
+            $venue = Venue::where('id', $id)
+                ->where('user_id', Auth::user()->id)
+                ->first();
+
+            if (!$venue) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Venue not found or you are not authorized to update it',
+                ], 404);
+            }
+
+            $dataToUpdate = [];
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                $oldImages = is_array($venue->image) ? $venue->image : json_decode($venue->image ?? '', true);
+
+                if (!empty($oldImages)) {
+                    foreach ($oldImages as $oldImage) {
+                        $parsedUrl = parse_url($oldImage, PHP_URL_PATH);
+                        $oldImagePath = ltrim($parsedUrl, '/');
+                        Helper::fileDelete($oldImagePath);
+                    }
+                }
+
+                $uploadedImages = [];
+                foreach ($request->file('image') as $image) {
+                    $uploadedImages[] = Helper::fileUpload(
+                        $image,
+                        'Venue',
+                        time() . '_' . $image->getClientOriginalName()
+                    );
+                }
+                $dataToUpdate['image'] = $uploadedImages;
+            }
+
+            // Prepare data for update
+            $updateData = [
+                'name' => $validated['name'] ?? $venue->name,
+                'location' => $validated['location'] ?? $venue->location,
+                'category_id' => $validated['category_id'] ?? $venue->category_id,
+                'price' => $validated['price'] ?? $venue->price,
+                'capacity' => $validated['capacity'] ?? $venue->capacity,
+                'description' => $validated['description'] ?? $venue->description,
+                'start_date' => $validated['start_date'] ?? $venue->start_date,
+                'ending_date' => $validated['ending_date'] ?? $venue->ending_date,
+                'latitude' => $validated['latitude'] ?? $venue->latitude,
+                'longitude' => $validated['longitude'] ?? $venue->longitude,
+            ];
+
+            // Merge image data if it exists
+            if (isset($dataToUpdate['image'])) {
+                $updateData['image'] = $dataToUpdate['image'];
+            }
+
+            $venue->update($updateData);
+
+            // Update weekdays
+            if (isset($validated['weekdays'])) {
+                foreach ($validated['weekdays'] as $weekdayData) {
+                    $weekday = $venue->weekdays()->where('weekday', $weekdayData['day'])->first();
+
+                    if ($weekday) {
+                        $weekday->update([
+                            'available_start_time' => $weekdayData['available_start_time'] ?? $weekday->available_start_time,
+                            'available_end_time' => $weekdayData['available_end_time'] ?? $weekday->available_end_time,
+                            'is_active' => $weekdayData['is_active'] ?? $weekday->is_active,
+                        ]);
+                    } else {
+                        $venue->weekdays()->create([
+                            'weekday' => $weekdayData['day'],
+                            'available_start_time' => $weekdayData['available_start_time'] ?? null,
+                            'available_end_time' => $weekdayData['available_end_time'] ?? null,
+                            'is_active' => $weekdayData['is_active'] ?? true,
+                        ]);
+                    }
+                }
+            }
+
+            // Update unavailable dates
+            if (!empty($validated['unavailable_date'])) {
+                OffDay::updateOrCreate(
+                    ['venue_id' => $venue->id],
+                    ['unavailable_date' => $validated['unavailable_date']]
+                );
+            }
+
+            DB::commit();
+
+            $availability = $this->generateAvailabilityPreview2(
+                $validated['start_date'] ?? $venue->start_date,
+                $validated['ending_date'] ?? $venue->ending_date,
+                $validated['weekdays'] ?? $venue->weekdays->toArray(),
+                $validated['unavailable_date'] ?? []
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Venue updated successfully',
+                'venue' => $venue->fresh(['weekdays', 'offDays']),
+                'availability' => $availability
+            ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Venue update failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    //venue update preview
+    protected function generateAvailabilityPreview2($startDate, $endDate, $weekdays, $unavailable_date)
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        $activeDays = collect($weekdays)->where('is_active', true)->pluck('day')->map(fn($day) => strtolower($day))->toArray();
+        $UnactiveDays = collect($weekdays)->where('is_active', false)->pluck('day')->map(fn($day) => strtolower($day))->toArray();
+
+        $unavailable_date = collect($unavailable_date)
+            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->toArray();
+
+        $availableDates = [];
+        $unavailableDates = [];
+
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+            $formattedDate = $date->format('Y-m-d');
+            $dayName = strtolower($date->format('l'));
+
+            if (in_array($formattedDate, $unavailable_date)) {
+                $unavailableDates[] = $formattedDate;
+                continue;
+            }
+
+            if (in_array($dayName, $activeDays)) {
+                $availableDates[] = $formattedDate;
+            } else {
+                $unavailableDates[] = $formattedDate;
+            }
+        }
+
+        return [
+            'active_weekdays' => $activeDays,
+            'Unactive_weekdays' => $UnactiveDays,
+            'off_days' => $unavailable_date,
+            'available_dates' => $availableDates,
+            'unavailable_dates' => $unavailableDates,
+
+        ];
+    }
+
+    //delete entertainer venue
+    public function venueDelete($id)
+    {
+        DB::beginTransaction();
+        try {
+            $venue = Venue::where('id', $id,)->where('user_id', Auth::user()->id)->with('bookings')->first();
+            if (!$venue) {
+                return response()->json([
+                    'failed' => false,
+                    'message' => 'venue ID not found',
+                ], 404);
+            }
+
+            //check booking
+            $hasBooked = $venue->bookings->contains(function ($booking) {
+                return $booking->status === 'booked';
+            });
+
+            if ($hasBooked) {
+                return response()->json([
+                    'failed' => false,
+                    'message' => 'venue cannot be deleted because it has active bookings.',
+                    'warning' => true,
+                ], 403);
+            }
+            if ($venue->image) {
+                $parsedUrl = parse_url($venue->image, PHP_URL_PATH);
+                $oldImagePath = ltrim($parsedUrl, '/');
+                Helper::fileDelete($oldImagePath);
+            }
+
+            $venue->weekdays()->delete();
+            $venue->offDays()->delete();
+            $venue->delete();
+
+            DB::commit();
+            return Helper::jsonResponse(true, 'venue deleted successfully', 200);
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'venue not found',
+                $e->getMessage()
+            ], 404);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage(),
+            ], 500);
         }
     }
 }

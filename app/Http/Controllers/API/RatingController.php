@@ -43,20 +43,20 @@ class RatingController extends Controller
             }
 
             $request->validate([
-                'booking_id' => 'required|exists:bookings,id',
+                'event_id' => 'required|exists:events,id',
             ]);
 
-            // Get all ratings related to the booking ID
+            // Get all ratings related to the 
             $ratings = Rating::with('user:id,name,avatar')
-                ->where('booking_id', $request->booking_id)
+                ->where('event_id', $request->event_id)
                 ->get();
 
-            $ratings->makeHidden(['created_at', 'updated_at','reciver_id']);
+            $ratings->makeHidden(['created_at', 'updated_at', 'reciver_id']);
 
             $Totalcount = $ratings->count();
             $Average = round($ratings->avg('rating'), 2);
 
-            return Helper::jsonResponse(true, 'Booking Ratings retrieved successfully.', 200, [
+            return Helper::jsonResponse(true, 'Ratings retrieved successfully.', 200, [
                 'Average' => $Average,
                 'Totalcount' => $Totalcount,
                 'ratings' => $ratings,
@@ -176,7 +176,7 @@ class RatingController extends Controller
     }
 
 
-    // Entertainers create for event owner  to rate booking users
+    //Entertainers create for event owner  to rate booking users
     public function CreateRatingE(Request $request)
     {
         try {
@@ -198,6 +198,10 @@ class RatingController extends Controller
             if (Auth::id() !== $event->user_id) {
                 return Helper::jsonErrorResponse(false, 'You are not authorized to rate this booking !');
             }
+            if ($booking->status !== 'completed') {
+                return Helper::jsonErrorResponse('You can only review completed bookings.', 400);
+            }
+
 
             // Check if the user has already rated this booking
             $existingRating = Rating::where('user_id', Auth::id())
@@ -223,7 +227,6 @@ class RatingController extends Controller
             return Helper::jsonErrorResponse('Something went wrong.', 500, [$e->getMessage()]);
         }
     }
-
 
 
     // //olny show list rating for event owner database query

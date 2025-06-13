@@ -2,178 +2,127 @@
 
 namespace Database\Seeders;
 
+use App\Models\Booking;
+use App\Models\Event;
+use App\Models\User;
+use App\Models\Venue;
+use App\Models\Weekday;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class BookingSeeder extends Seeder
 {
     public function run(): void
     {
-        $bookings = [
-            [
-                'user_id' => 2,
-                'event_id' => 1,
-                'venue_id' => null,
-                'location' => 'Central Park',
-                'name' => 'Summer Music Festival Booking',
-                'booking_date' => '2025-07-01',
-                'booking_start_time' => '14:00:00',
-                'booking_end_time' => '23:00:00',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'booked',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'event_id' => null,
-                'venue_id' => 1,
-                'location' => '123 Main St, Cityville',
-                'name' => 'Grand Ballroom Booking',
-                'booking_date' => '2025-06-30',
-                'booking_start_time' => '08:00:00',
-                'booking_end_time' => '23:00:00',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'upcoming',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'event_id' => 3,
-                'venue_id' => null,
-                'location' => 'Downtown Theater',
-                'name' => 'Comedy Night Booking',
-                'booking_date' => '2025-05-30',
-                'booking_start_time' => '20:00:00',
-                'booking_end_time' => '23:30:00',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'in-progress',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'event_id' => null,
-                'venue_id' => 2,
-                'location' => '456 Market St, Cityville',
-                'name' => 'Downtown Conference Center Booking',
-                'booking_date' => '2025-05-30',
-                'booking_start_time' => '07:00:00',
-                'booking_end_time' => '21:00:00',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'in-progress',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'event_id' => 5,
-                'venue_id' => null,
-                'location' => 'City Hall Auditorium',
-                'name' => 'Dance Gala Booking',
-                'booking_date' => '2025-05-30',
-                'booking_start_time' => '19:00:00',
-                'booking_end_time' => '22:00:00',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'completed',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'event_id' => null,
-                'venue_id' => 3,
-                'location' => '789 Garden Ave, Cityville',
-                'name' => 'Open Air Garden Booking',
-                'booking_date' => '2025-06-30',
-                'booking_start_time' => '09:00:00',
-                'booking_end_time' => '20:00:00',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'booked',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'event_id' => 2,
-                'venue_id' => null,
-                'location' => 'Grand Convention Center',
-                'name' => 'Business Conference Booking',
-                'booking_date' => '2025-05-30',
-                'booking_start_time' => '09:00:00',
-                'booking_end_time' => '18:00:00',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'upcoming',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'event_id' => null,
-                'venue_id' => 4,
-                'location' => '101 City Hall Rd, Cityville',
-                'name' => 'City Hall Auditorium Booking',
-                'booking_date' => '2025-05-29',
-                'booking_start_time' => '10:00:00',
-                'booking_end_time' => '22:00:00',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'in-progress',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 2,
-                'event_id' => null,
-                'venue_id' => 5,
-                'location' => '202 Skyline Blvd, Cityville',
-                'name' => 'Rooftop Terrace Booking',
-                'booking_date' => '2025-05-30',
-                'booking_start_time' => '16:00:00',
-                'booking_end_time' => '23:59:59',
-                'platform_rate' => 500.00,
-                'fee_percentage' => 17.00,
-                'fee_amount' => 85.00,
-                'net_amount' => 415.00,
-                'info' => 'Paid 24h after event completion',
-                'status' => 'upcoming',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ];
+        $user = User::find(2);
 
-        DB::table('bookings')->insert($bookings);
+        //event booking
+        $eventIds = range(1, 15);
+        foreach ($eventIds as $eventId) {
+            $event = Event::find($eventId);
+            if (!$event) {
+                continue;
+            }
+
+            $startDate = Carbon::parse($event->start_date);
+            $endDate = Carbon::parse($event->ending_date);
+
+            $totalDays = $startDate->diffInDays($endDate);
+            $bookingDate = $startDate->copy()->addDays(rand(0, $totalDays))->toDateString();
+
+            if (Booking::where('event_id', $eventId)->where('booking_date', $bookingDate)->exists()) {
+                continue;
+            }
+
+            // Get weekday info
+            $dayName = strtolower(Carbon::parse($bookingDate)->format('l'));
+            $weekday = $event->weekdays()->where('weekday', $dayName)->first();
+
+            if (!$weekday || !$weekday->is_active) {
+                continue;
+            }
+
+            $start = Carbon::parse($weekday->available_start_time);
+            $end = Carbon::parse($weekday->available_end_time);
+            $hours = ceil($start->diffInMinutes($end) / 60);
+
+            $platformRate = $hours * 100;
+            $feePercentage = 17;
+            $feeAmount = ($platformRate * $feePercentage) / 100;
+            $netAmount = $platformRate - $feeAmount;
+            $statuses = ['pending', 'booked', 'upcoming', 'in-progress', 'completed'];
+
+            Booking::create([
+                'user_id'            => $user->id,
+                'event_id'           => $eventId,
+                'location'           => $event->location,
+                'name'               => $user->name,
+                'booking_date'       => $bookingDate,
+                'booking_start_time' => $weekday->available_start_time,
+                'booking_end_time'   => $weekday->available_end_time,
+                'platform_rate'      => $platformRate,
+                'fee_percentage'     => $feePercentage,
+                'fee_amount'         => $feeAmount,
+                'net_amount'         => $netAmount,
+                'status'             => $statuses[array_rand($statuses)],
+                'created_at'         => now(),
+                'updated_at'         => now(),
+            ]);
+        }
+
+        //venue Booking
+        $venueIds = range(1, 10);
+        foreach ($venueIds as $venueId) {
+            $venue = Venue::find($venueId);
+            if (!$venue) {
+                continue;
+            }
+
+            $startDate = Carbon::parse($venue->start_date);
+            $endDate = Carbon::parse($venue->ending_date);
+
+            $totalDays = $startDate->diffInDays($endDate);
+            $bookingDate = $startDate->copy()->addDays(rand(0, $totalDays))->toDateString();
+
+            if (Booking::where('venue_id', $venueId)->where('booking_date', $bookingDate)->exists()) {
+                continue;
+            }
+
+            // Get weekday info
+            $dayName = strtolower(Carbon::parse($bookingDate)->format('l'));
+            $weekday = $venue->weekdays()->where('weekday', $dayName)->first();
+
+            if (!$weekday || !$weekday->is_active) {
+                continue;
+            }
+
+            $start = Carbon::parse($weekday->available_start_time);
+            $end = Carbon::parse($weekday->available_end_time);
+            $hours = ceil($start->diffInMinutes($end) / 60);
+
+            $platformRate = $hours * 100;
+            $feePercentage = 17;
+            $feeAmount = ($platformRate * $feePercentage) / 100;
+            $netAmount = $platformRate - $feeAmount;
+            $statuses = ['pending', 'booked', 'upcoming', 'in-progress', 'completed'];
+
+            Booking::create([
+                'user_id'            => $user->id,
+                'venue_id'           => $venueId,
+                'location'           => $venue->location,
+                'name'               => $user->name,
+                'booking_date'       => $bookingDate,
+                'booking_start_time' => $weekday->available_start_time,
+                'booking_end_time'   => $weekday->available_end_time,
+                'platform_rate'      => $platformRate,
+                'fee_percentage'     => $feePercentage,
+                'fee_amount'         => $feeAmount,
+                'net_amount'         => $netAmount,
+                'status'             => $statuses[array_rand($statuses)],
+                'created_at'         => now(),
+                'updated_at'         => now(),
+            ]);
+        }
     }
 }

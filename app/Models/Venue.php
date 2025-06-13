@@ -59,4 +59,13 @@ class Venue extends Model
     {
         return $this->belongsTo(Category::class);
     }
+    public function weekdays()
+    {
+        return $this->hasMany(Weekday::class);
+    }
+
+    public function offdays()
+    {
+        return $this->hasMany(OffDay::class);
+    }
 }

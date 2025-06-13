@@ -3,107 +3,176 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Event;
+use App\Models\Weekday;
+use App\Models\OffDay;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class EventSeeder extends Seeder
 {
     public function run(): void
     {
-        // Sample events data
         $events = [
             [
-                'user_id' => 3,
-                'name' => 'Summer Music Festival',
-                'location' => 'Central Park',
-                'category_id' => 1, // assuming Music category from your categories
-                'price' => 200.00,
-                'about' => 'An open-air music festival featuring top bands.',
-                'start_date' => '2025-05-20',
-                'ending_date' => '2025-05-31',
-                'available_start_time' => '14:00:00',
-                'available_end_time' => '23:00:00',
-                //image null
-                'latitude' => 40.785091,
-                'longitude' => -73.968285,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'name' => 'event 1',
+                'location' => 'Los Angeles',
+                'category_id' => 1,
+                'price' => 100,
+                'about' => 'A luxurious venue for events1',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-07-01',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
             ],
             [
-                'user_id' => 3,
-                'name' => 'Business Conference 2025',
-                'location' => 'Grand Convention Center',
-                'category_id' => 2, // Conference Room category
-                'price' => 100.00,
-                'about' => 'Annual business conference with keynote speakers.',
-                'start_date' => '2025-05-27',
-                'ending_date' => '2025-05-31',
-                'available_start_time' => '09:00:00',
-                'available_end_time' => '18:00:00',
-                //image null
-                'latitude' => 34.052235,
-                'longitude' => -118.243683,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'name' => 'event 2',
+                'location' => 'New York',
+                'category_id' => 2,
+                'price' => 100,
+                'about' => 'Open garden suitable for weddings 2',
+                'start_date' => '2025-06-01',
+                'ending_date' => '2025-07-20',
+                'latitude' => 24.0522,
+                'longitude' => 91.2437,
             ],
             [
-                'user_id' => 3,
-                'name' => 'Comedy Night',
-                'location' => 'Downtown Theater',
-                'category_id' => 3, // Comedy category
-                'price' => 100.00,
-                'about' => 'A night filled with laughs and top comedians.',
-                'start_date' => '2025-05-21',
-                'ending_date' => '2025-05-30',
-                'available_start_time' => '20:00:00',
-                'available_end_time' => '23:30:00',
-                //image null
-                'latitude' => 41.878113,
-                'longitude' => -87.629799,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'name' => 'event 3',
+                'location' => 'Bogura',
+                'category_id' => 3,
+                'price' => 200,
+                'about' => 'Banquet hall in downtown Chicago 3',
+                'start_date' => '2025-06-01',
+                'ending_date' => '2025-08-30',
+                'latitude' => 25.0522,
+                'longitude' => 92.2437,
             ],
             [
-                'user_id' => 3,
-                'name' => 'Photography Workshop',
-                'location' => 'Art Studio',
-                'category_id' => 4, // Photography category
-                'price' => 150.00,
-                'about' => 'Hands-on photography workshop for beginners.',
-                'start_date' => '2025-05-20',
-                'ending_date' => '2025-06-30',
-                'available_start_time' => '10:00:00',
-                'available_end_time' => '16:00:00',
-                //image null
-                'latitude' => 37.774929,
-                'longitude' => -122.419416,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'name' => 'event 4',
+                'location' => 'Sirajgonj',
+                'category_id' => 4,
+                'price' => 200,
+                'about' => 'Best for corporate conferences 4',
+                'start_date' => '2025-06-01',
+                'ending_date' => '2025-09-30',
+                'latitude' => 26.0522,
+                'longitude' => 93.2437,
             ],
             [
-                'user_id' => 3,
-                'name' => 'Dance Gala',
-                'location' => 'City Hall Auditorium',
-                'category_id' => 2, // Dance category
-                'price' => 120.00,
-                'about' => 'An evening showcasing diverse dance performances.',
-                'start_date' => '2025-05-27',
-                'ending_date' => '2025-05-30',
-                'available_start_time' => '19:00:00',
-                'available_end_time' => '22:00:00',
-                //image null
-                'latitude' => 51.507351,
-                'longitude' => -0.127758,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'name' => 'event 5',
+                'location' => 'Pabna',
+                'category_id' => 1,
+                'price' => 200,
+                'about' => 'Beachside open event resort 5',
+                'start_date' => '2025-06-01',
+                'ending_date' => '2025-10-20',
+                'latitude' => 27.0522,
+                'longitude' => 94.2437,
+            ],
+            [
+                'name' => 'event 6',
+                'location' => 'Dhaka',
+                'category_id' => 2,
+                'price' => 100,
+                'about' => 'Event 6',
+                'start_date' => '2025-06-15',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
+            ],
+            [
+                'name' => 'event 7',
+                'location' => 'Dhaka',
+                'category_id' => 2,
+                'price' => 150,
+                'about' => 'Event Green Field Resort 7',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
+            ],
+            [
+                'name' => 'event 8',
+                'location' => 'Dhaka',
+                'category_id' => 4,
+                'price' => 150,
+                'about' => 'Event Green Field Resort 8',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
+            ],
+            [
+                'name' => 'event 9',
+                'location' => 'kishoregonj',
+                'category_id' => 3,
+                'price' => 150,
+                'about' => 'Event Green Field Resort 9',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
+            ],
+            [
+                'name' => 'event 10',
+                'location' => 'new work',
+                'category_id' => 1,
+                'price' => 150,
+                'about' => 'Event Green Field Resort 10',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
             ],
         ];
 
-        DB::table('events')->insert($events);
+        $weekdays = [
+            'saturday' => ['10:00', '12:00', true],
+            'sunday' => ['10:00', '11:00', true],
+            'monday' => ['09:00', '12:00', true],
+            'tuesday' => ['09:00', '12:00', true],
+            'wednesday' => ['09:00', '12:00', true],
+            'thursday' => ['09:00', '12:00', true],
+            'friday' => ['09:00', '10:00', false],
+        ];
+
+        $offDays = ["2025-06-28", "2025-06-29"];
+        foreach ($events as $index => $data) {
+            DB::beginTransaction();
+            try {
+                $event = Event::create([
+                    'user_id' => 3,
+                    'name' => $data['name'],
+                    'location' => $data['location'],
+                    'category_id' => $data['category_id'],
+                    'price' => $data['price'],
+                    'about' => $data['about'],
+                    'start_date' => $data['start_date'],
+                    'ending_date' => $data['ending_date'],
+                    'latitude' => $data['latitude'],
+                    'longitude' => $data['longitude'],
+                    'image' => null,
+                ]);
+
+                foreach ($weekdays as $day => [$start, $end, $active]) {
+                    Weekday::create([
+                        'event_id' => $event->id,
+                        'weekday' => $day,
+                        'available_start_time' => $start,
+                        'available_end_time' => $end,
+                        'is_active' => $active,
+                    ]);
+                }
+
+                offDay::create([
+                    'event_id' => $event->id,
+                    'unavailable_date' => $offDays,
+                ]);
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+            }
+        }
     }
 }

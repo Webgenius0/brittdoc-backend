@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\Event;
 use App\Models\User;
 use App\Models\Venue;
+use App\Models\Weekday;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -98,7 +99,6 @@ class BookingController extends Controller
             return Helper::jsonResponse(false, 'Event booking creation failed.', 500, $e->getMessage());
         }
     }
-
 
     public function status(Request $request)
     {
@@ -221,9 +221,14 @@ class BookingController extends Controller
                 },
                 'user:id,name,avatar',
                 'rating'
-            ])
-                ->where('id', $id)
-                ->first();
+            ])->where('id', $id)->first();
+
+            if (!empty($BookedDetails->venue_id)) {
+                $BookedDetails->makeHidden('event_id');
+            } elseif (!empty($BookedDetails->event_id)) {
+                $BookedDetails->makeHidden('venue_id');
+            }
+
 
             if (!$BookedDetails) {
                 return Helper::jsonErrorResponse('Event/Venue Booked Details Retrived Failed', 403);
@@ -383,6 +388,93 @@ class BookingController extends Controller
             }
         } catch (Exception $e) {
             return Helper::jsonErrorResponse('Failed to  booking status', 500, [$e->getMessage()]);
+        }
+    }
+
+
+    //====================client uupdate ============================
+    public function eventBooking(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'booking_date' => 'required|date|after_or_equal:today',
+            ]);
+
+            $event = Event::find($id);
+            if (!$event) {
+                return response()->json(['message' => 'Event Id Not found.'], 404);
+            }
+
+            // Check for existing booking on the same date
+            $bookingDate = Carbon::parse($request->booking_date)->toDateString();
+            $existingBooking = Booking::where('event_id', $id)
+                ->whereDate('booking_date', $bookingDate)
+                ->first();
+
+            if ($existingBooking) {
+                return Helper::jsonResponse(false, 'This event is already booked on this date.', 422);
+            }
+
+            // Validate booking date within event range
+            $startDate = Carbon::parse($event->start_date)->toDateString();
+            $endDate = Carbon::parse($event->ending_date)->toDateString();
+
+            $validator->after(function ($validator) use ($bookingDate, $startDate, $endDate) {
+                if (!($bookingDate >= $startDate && $bookingDate <= $endDate)) {
+                    $validator->errors()->add('booking_date', "Booking date must be between $startDate and $endDate.");
+                }
+            });
+
+            if ($validator->fails()) {
+                return Helper::jsonResponse(false, 'Booking Date not Available.', 422, $validator->errors());
+            }
+
+            //time insert 
+            $dayName = strtolower(Carbon::parse($bookingDate)->format('l'));
+            $weekday = Weekday::where('event_id', $id)->where('weekday', $dayName)->first();
+
+            if (!$weekday) {
+                return Helper::jsonResponse(false, 'This event is not available on this day.', 422);
+            }
+
+            $start = Carbon::parse($weekday->available_start_time);
+            $end = Carbon::parse($weekday->available_end_time);
+
+            if ($end->lt($start)) {
+                [$start, $end] = [$end, $start];
+            }
+
+            $diffInMinutes = $start->diffInMinutes($end);
+            $hours = (int) ceil($diffInMinutes / 60);
+
+            // dd($hours);
+            $platform_rate = $hours * 100;
+            $fee_percentage = 17;
+            $fee_amount = ($platform_rate * $fee_percentage) / 100;
+            $net_amount = $platform_rate - $fee_amount;
+
+            $user = Auth::user();
+
+            $booking = Booking::create([
+                'user_id'             => $user->id,
+                'event_id'            => $event->id,
+                'category'            => $event->category_id,
+                'location'            => $event->location,
+                'name'                => $user->name,
+                'image'               => $user->image,
+                'booking_date'        => $bookingDate,
+                'booking_start_time'  => $weekday->available_start_time,
+                'booking_end_time'    => $weekday->available_end_time,
+                'platform_rate'       => $platform_rate,
+                'fee_percentage'      => $fee_percentage,
+                'fee_amount'          => $fee_amount,
+                'net_amount'          => $net_amount,
+                'status'              => 'pending'
+            ]);
+
+            return Helper::jsonResponse(true, 'Event booking created successfully.', 200, $booking);
+        } catch (Exception $e) {
+            return Helper::jsonResponse(false, 'Event booking creation failed.', 500, $e->getMessage());
         }
     }
 }

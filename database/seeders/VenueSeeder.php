@@ -3,110 +3,188 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Venue;
+use App\Models\Weekday;
+use App\Models\OffDay;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
-class VenueSeeder extends Seeder
+class venueSeeder extends Seeder
 {
     public function run(): void
     {
         $venues = [
             [
-                'user_id' => 4,
-                'name' => 'Grand Ballroom',
-                'category_id' => 5, // Banquet Hall category (venue_holder)
-                'description' => 'Spacious ballroom suitable for weddings and large events.',
-                'location' => '123 Main St, Cityville',
-                'capacity' => 300,
-                'price' => 100.00,
-                'start_date' => '2025-06-01',
-                'ending_date' => '2025-12-31',
-                'available_start_time' => '08:00:00',
-                'available_end_time' => '23:00:00',
-
-                'latitude' => 40.712776,
-                'longitude' => -74.005974,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 4,
-                'name' => 'Downtown Conference Center',
-                'category_id' => 6, 
-                'description' => 'Modern conference center with multiple meeting rooms.',
-                'location' => '456 Market St, Cityville',
-                'capacity' => 150,
-                'price' => 100.00,
-                'start_date' => '2025-04-15',
-                'ending_date' => '2025-12-31',
-                'available_start_time' => '07:00:00',
-                'available_end_time' => '21:00:00',
-
-                'latitude' => 40.758896,
-                'longitude' => -73.985130,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => 4,
-                'name' => 'Open Air Garden',
-                'category_id' => 7, 
-                'description' => 'Beautiful garden venue perfect for outdoor ceremonies.',
-                'location' => '789 Garden Ave, Cityville',
+                'name' => 'venue 1',
+                'location' => 'Los Angeles',
+                'category_id' => 5,
+                'price' => 100,
                 'capacity' => 200,
-                'price' =>300.00,
-                'start_date' => '2025-05-01',
-                'ending_date' => '2025-10-31',
-                'available_start_time' => '09:00:00',
-                'available_end_time' => '20:00:00',
-
-                'latitude' => 40.730610,
-                'longitude' => -73.935242,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'capacity' => 200,
+                'description' => 'A luxurious venue for venues1',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-07-01',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
             ],
             [
-                'user_id' => 4,
-                'name' => 'City Hall Auditorium',
-                'category_id' => 5, 
-                'description' => 'Large auditorium suitable for performances and conferences.',
-                'location' => '101 City Hall Rd, Cityville',
-                'capacity' => 500,
-                'price' => 100.00,
-                'start_date' => '2025-01-01',
-                'ending_date' => '2025-12-31',
-                'available_start_time' => '10:00:00',
-                'available_end_time' => '22:00:00',
-
-                'latitude' => 40.712217,
-                'longitude' => -74.016058,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'name' => 'venue 2',
+                'location' => 'New York',
+                'category_id' => 6,
+                'price' => 100,
+                'capacity' => 200,
+                'description' => 'Open garden suitable for weddings 2',
+                'start_date' => '2025-06-01',
+                'ending_date' => '2025-07-20',
+                'latitude' => 24.0522,
+                'longitude' => 91.2437,
             ],
             [
-                'user_id' => 4,
-                'name' => 'Rooftop Terrace',
-                'category_id' => 7, 
-                'description' => 'Open rooftop venue with stunning city views.',
-                'location' => '202 Skyline Blvd, Cityville',
-                'capacity' => 100,
-                'price' => 200.00,
-                'start_date' => '2025-03-01',
-                'ending_date' => '2025-12-31',
-                'available_start_time' => '16:00:00',
-                'available_end_time' => '23:59:59',
-
-                'latitude' => 40.741895,
-                'longitude' => -73.989308,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'name' => 'venue 3',
+                'location' => 'Bogura',
+                'category_id' => 7,
+                'price' => 100,
+                'capacity' => 200,
+                'description' => 'Banquet hall in downtown Chicago 3',
+                'start_date' => '2025-06-01',
+                'ending_date' => '2025-08-30',
+                'latitude' => 25.0522,
+                'longitude' => 92.2437,
+            ],
+            [
+                'name' => 'venue 4',
+                'location' => 'Sirajgonj',
+                'category_id' => 6,
+                'price' => 250,
+                'capacity' => 200,
+                'description' => 'Best for corporate conferences 4',
+                'start_date' => '2025-06-01',
+                'ending_date' => '2025-09-30',
+                'latitude' => 26.0522,
+                'longitude' => 93.2437,
+            ],
+            [
+                'name' => 'venue 5',
+                'location' => 'Pabna',
+                'category_id' => 5,
+                'price' => 200,
+                'capacity' => 200,
+                'description' => 'Beachside open venue resort 5',
+                'start_date' => '2025-06-01',
+                'ending_date' => '2025-10-20',
+                'latitude' => 27.0522,
+                'longitude' => 94.2437,
+            ],
+            [
+                'name' => 'venue 6',
+                'location' => 'Dhaka',
+                'category_id' => 6,
+                'price' => 200,
+                'capacity' => 200,
+                'description' => 'venue 6',
+                'start_date' => '2025-06-15',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
+            ],
+            [
+                'name' => 'venue 7',
+                'location' => 'Dhaka',
+                'category_id' => 6,
+                'price' => 150,
+                'capacity' => 200,
+                'description' => 'venue Green Field Resort 7',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
+            ],
+            [
+                'name' => 'venue 8',
+                'location' => 'Dhaka',
+                'category_id' => 7,
+                'price' => 150,
+                'capacity' => 200,
+                'description' => 'venue Green Field Resort 8',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
+            ],
+            [
+                'name' => 'venue 9',
+                'location' => 'kishoregonj',
+                'category_id' => 8,
+                'price' => 150,
+                'capacity' => 200,
+                'description' => 'venue Green Field Resort 9',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
+            ],
+            [
+                'name' => 'venue 10',
+                'location' => 'new work',
+                'category_id' => 6,
+                'price' => 150,
+                'capacity' => 200,
+                'description' => 'venue Green Field Resort 10',
+                'start_date' => '2025-06-12',
+                'ending_date' => '2025-10-20',
+                'latitude' => 23.0522,
+                'longitude' => 90.2437,
             ],
         ];
 
-        DB::table('venues')->insert($venues);
+        $weekdays = [
+            'saturday' => ['10:00', '12:00', true],
+            'sunday' => ['10:00', '11:00', true],
+            'monday' => ['09:00', '12:00', true],
+            'tuesday' => ['09:00', '12:00', true],
+            'wednesday' => ['09:00', '12:00', true],
+            'thursday' => ['09:00', '12:00', true],
+            'friday' => ['09:00', '10:00', false],
+        ];
+
+        $offDays = ["2025-06-28", "2025-06-29"];
+        foreach ($venues as $index => $data) {
+            DB::beginTransaction();
+            try {
+                $venue = Venue::create([
+                    'user_id' => 4,
+                    'name' => $data['name'],
+                    'location' => $data['location'],
+                    'category_id' => $data['category_id'],
+                    'price' => $data['price'],
+                    'capacity' => $data['capacity'],
+                    'description' => $data['description'],
+                    'start_date' => $data['start_date'],
+                    'ending_date' => $data['ending_date'],
+                    'latitude' => $data['latitude'],
+                    'longitude' => $data['longitude'],
+                    'image' => null,
+                ]);
+
+                foreach ($weekdays as $day => [$start, $end, $active]) {
+                    Weekday::create([
+                        'venue_id' => $venue->id,
+                        'weekday' => $day,
+                        'available_start_time' => $start,
+                        'available_end_time' => $end,
+                        'is_active' => $active,
+                    ]);
+                }
+
+                offDay::create([
+                    'venue_id' => $venue->id,
+                    'unavailable_date' => $offDays,
+                ]);
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+            }
+        }
     }
 }

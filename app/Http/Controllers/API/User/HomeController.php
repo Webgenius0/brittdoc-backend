@@ -18,8 +18,15 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         try {
-            $events = Event::with('category:id,name,image')->select('id', 'name', 'image', 'location', 'price', 'category_id')->with('rating')->get();
-
+            $events = Event::with(['category:id,name,image',
+                'rating' => function ($query) {
+                    $query->whereHas('user', function ($q) {
+                        $q->where('role', 'user');
+                    })->select('id', 'user_id', 'event_id', 'rating', 'comment');
+                }
+            ])->select('id', 'name', 'image', 'location', 'price', 'category_id')->get();
+            // $events = Event::with('category:id,name,image')->select('id', 'name', 'image', 'location', 'price', 'category_id')->with('rating')->get();
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Event show successfully',

@@ -48,4 +48,13 @@ class Event extends Model
     {
         return $this->hasOne(Rating::class);
     }
+    public function weekdays()
+    {
+        return $this->hasMany(Weekday::class);
+    }
+
+    public function offdays()
+    {
+        return $this->hasMany(OffDay::class);
+    }
 }
